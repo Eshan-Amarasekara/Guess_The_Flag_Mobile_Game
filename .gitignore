@@ -22,3 +22,23 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+#contains information about the development module
+*.iml
+.gradle
+#path to the Android SDK
+/local.properties
+#project-specific settings and configuration files for Android Studio
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+#compiled code and build artifacts
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
