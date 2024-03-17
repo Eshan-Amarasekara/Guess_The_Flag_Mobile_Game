@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -192,15 +193,19 @@ fun AnswerList(){
         "VN" to "Vietnam", "VU" to "Vanuatu", "WF" to "Wallis and Futuna Islands", "WS" to "Samoa", "XK" to "Kosovo",
         "YE" to "Yemen", "YT" to "Mayotte", "ZA" to "South Africa", "ZM" to "Zambia", "ZW" to "Zimbabwe"
     )
-    LazyColumn(modifier= Modifier.height(200.dp)) {
+    LazyColumn(
+            modifier = Modifier
+                .height(300.dp)
+                .background(Color.LightGray) // Change Color.LightGray to whatever color you prefer
+                .width(600.dp)
+    ) {
         items(countriesList.values.toList()) { countryName ->
             Text(
                 text = countryName,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.clickable(onClick = { })
-
+                modifier = Modifier.clickable(onClick = { }),
             )
         }
     }
