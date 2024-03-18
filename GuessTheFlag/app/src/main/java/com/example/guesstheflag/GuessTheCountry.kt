@@ -46,55 +46,25 @@ import androidx.compose.ui.unit.sp
 
 class GuessTheCountry : ComponentActivity() {
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val context = LocalContext.current
-            var flagIndex = flagIndexInit()
 
-            var selectedCountry = countryInit()
-            var answer by remember { mutableStateOf<String>("") }
+
             Column{
                 Row(modifier= Modifier.align(Alignment.CenterHorizontally)) {
                     //Calling Function to Generate a random flag and display
                     CountryCodeList()
 
                 }
-                Row{
-                    //Calling Function to list down the answers
-                    AnswerList()
-                }
 
-                Row{
-
-                }
 
                 //Submit Button
-                Row(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    ){
 
-
-                    Button(onClick = {     var valueFromMap = countriesList.toList()[flagIndex].second
-
-
-                        if (valueFromMap==selectedCountry){
-                            answer="Correct"
-                        }else{
-                            answer="Incorrect"
-                        }
-                        },
-                        colors = ButtonDefaults.buttonColors(Color(235, 127, 0))) {
-                        Text (text = "Submit")
-                    }
-
-
-                }
-                Row {
-                    Text(text = answer)
-                }
+//                Row {
+//                    Text(text = answer)
+//                }
             }
         }
     }
@@ -103,36 +73,98 @@ class GuessTheCountry : ComponentActivity() {
 //Function to Generate Random Flag from list
 @Composable
 fun GenerateRandomFlag(list : List<Int>) {
-    var flag by remember{ mutableIntStateOf(0) }
-    flag= remember{list.random()}
-    var flagIndex = remember{list.indexOf(flag)}
-    Log.d(flagIndex.toString(), "GenerateRandomFlag: ")
-    val imageModifier = Modifier
-        .padding(20.dp)
-        .border(BorderStroke(6.dp, Color.Black))
-        .sizeIn(maxWidth = 300.dp, maxHeight = 300.dp)
+    var flagIndex by remember { mutableIntStateOf(0) }
+    Row {
+        var flag by remember { mutableIntStateOf(0) }
+        flag = remember { list.random() }
+        flagIndex = remember { list.indexOf(flag) }
+        Log.d(flagIndex.toString(), "GenerateRandomFlag: ")
+        val imageModifier = Modifier
+            .padding(20.dp)
+            .border(BorderStroke(6.dp, Color.Black))
+            .sizeIn(maxWidth = 300.dp, maxHeight = 300.dp)
 
 
 
-    Image(
-        painter = painterResource(id = flag),
-        contentDescription = " ",
-        contentScale = ContentScale.FillHeight,
-        modifier = imageModifier
+        Image(
+            painter = painterResource(id = flag),
+            contentDescription = " ",
+            contentScale = ContentScale.FillHeight,
+            modifier = imageModifier
 
-    )
+        )
+    }
+    Row {
+        var selectedCountry by remember { mutableStateOf<String?>(null) }
+        LazyColumn(
+            modifier = Modifier
+                .height(300.dp)
+                .width(600.dp)
+                .padding(10.dp)
+
+        ) {
+            //Generating answers by mapping values into clickable boxes
+            items(countriesList.values.toList()) { countryName ->
+                val isSelected = countryName == selectedCountry
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            if (isSelected) Color(235, 127, 0) else Color.White,
+                            shape = RoundedCornerShape(18.dp) // Set border radius here
+                        )
+                        .clickable(onClick = { selectedCountry = countryName })
+                        .border(
+                            BorderStroke(4.dp, Color(235, 127, 0)),
+                            shape = RoundedCornerShape(18.dp)
+                        ),
+
+                    ) {
+                    Text(
+                        text = " $countryName",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left,
+                        color = if (isSelected) Color.White else Color.Black, // Change Color.Red to your desired color
+                        modifier = Modifier
+                            .fillMaxWidth() // Ensure text does not overflow horizontally
+                            .padding(horizontal = 16.dp) // Add padding to prevent overflow
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp)) // Add space between boxes
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            var answer by remember { mutableStateOf<String>("") }
+            Button(
+                onClick = {
+                    var valueFromMap = countriesList.toList()[flagIndex].second
+                    if (valueFromMap == selectedCountry) {
+                        answer = "Correct"
+                    } else {
+                        answer = "Incorrect"
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
+            ) {
+                Text(text = "Submit")
+            }
 
 
+        }
+    }
+    Row{
+
+    }
 }
 
-@Composable
-fun flagIndexInit(): Int{
-    var flagIndex by remember { mutableStateOf<Int>(0) }
-    return flagIndex
-}
 
 
-@Preview
+//@Preview
 @Composable
 //Country image name list with rendering code snippet
 fun CountryCodeList() {
@@ -250,57 +282,19 @@ val countriesList = mapOf(
     "YE" to "Yemen", "YT" to "Mayotte", "ZA" to "South Africa", "ZM" to "Zambia", "ZW" to "Zimbabwe"
 )
 
-@Composable
+//@Composable
 
-fun countryInit(): String?{
-    var selectedCountry by remember { mutableStateOf<String?>(null) }
-    return selectedCountry
-}
+//fun countryInit(): String?{
+//
+//    return selectedCountry
+//}
 
-@Composable
+//@Composable
 //List of Countries for the Answers List
-fun AnswerList(){
-
-    var selectedCountry = countryInit()
-    LazyColumn(
-        modifier = Modifier
-            .height(300.dp)
-            .width(600.dp)
-            .padding(10.dp)
-
-    ) {
-        //Generating answers by mapping values into clickable boxes
-        items(countriesList.values.toList()) { countryName ->
-            val isSelected = countryName == selectedCountry
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        if (isSelected) Color(235, 127, 0) else Color.White,
-                        shape = RoundedCornerShape(18.dp) // Set border radius here
-                    )
-                    .clickable(onClick = { selectedCountry = countryName })
-                    .border(
-                        BorderStroke(4.dp, Color(235, 127, 0)),
-                        shape = RoundedCornerShape(18.dp)
-                    ),
-
-            ) {
-                Text(
-                    text = " $countryName",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Left,
-                    color = if (isSelected) Color.White else Color.Black, // Change Color.Red to your desired color
-                    modifier = Modifier
-                        .fillMaxWidth() // Ensure text does not overflow horizontally
-                        .padding(horizontal = 16.dp) // Add padding to prevent overflow
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp)) // Add space between boxes
-        }
-    }
-}
+//fun AnswerList(){
+//
+//
+//}
 
 //@Composable
 //fun CheckAnswer(countryName: String){
