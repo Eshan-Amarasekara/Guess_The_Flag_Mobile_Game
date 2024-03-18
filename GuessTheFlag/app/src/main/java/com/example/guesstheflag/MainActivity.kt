@@ -49,11 +49,11 @@ fun HomePage(){
                 var i = Intent(context, GuessTheCountry::class.java)
                 context.startActivity(i)
             },modifier=Modifier
-                .size(110.dp),
+                .width(130.dp),
 //                colors = ButtonDefaults.buttonColors(
 //                    containerColor = Color.Black),
-                border = BorderStroke(3.dp, Color.Black),
-                shape = RoundedCornerShape(20),
+                border = BorderStroke(3.dp, Color(235, 127, 0)),
+                shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
             {
                 Text(text = "Guess the Country")
@@ -61,11 +61,11 @@ fun HomePage(){
             Spacer(modifier = Modifier.width(16.dp))
 
             Button(onClick = {},modifier=Modifier
-                .size(110.dp),
+                .width(130.dp),
 //                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color.Magenta),
-                border = BorderStroke(3.dp, Color.Black),
-                shape = RoundedCornerShape(20),
+//                    containerColor = Color.Black),
+                border = BorderStroke(3.dp, Color(235, 127, 0)),
+                shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
 
             {
@@ -76,11 +76,11 @@ fun HomePage(){
 
         Row{
             Button(onClick = {},modifier=Modifier
-                .size(110.dp),
+                .width(130.dp),
 //                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color.Magenta),
-                border = BorderStroke(3.dp, Color.Black),
-                shape = RoundedCornerShape(20),
+//                    containerColor = Color.Black),
+                border = BorderStroke(3.dp, Color(235, 127, 0)),
+                shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
             {
                 Text(text = "Guess the Flag")
@@ -88,11 +88,11 @@ fun HomePage(){
             Spacer(modifier = Modifier.width(16.dp))
 
             Button(onClick = {},modifier=Modifier
-                .size(110.dp),
+                .width(130.dp),
 //                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color.Magenta),
-                border = BorderStroke(3.dp, Color.Black),
-                shape = RoundedCornerShape(20),
+//                    containerColor = Color.Black),
+                border = BorderStroke(3.dp, Color(235, 127, 0)),
+                shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
             {
                 Text(text = "Advanced Level")
