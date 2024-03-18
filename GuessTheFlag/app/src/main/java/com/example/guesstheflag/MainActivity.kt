@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -53,7 +54,8 @@ fun HomePage(){
 //                    containerColor = Color.Black),
                 border = BorderStroke(3.dp, Color.Black),
                 shape = RoundedCornerShape(20),
-            ) {
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
+            {
                 Text(text = "Guess the Country")
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -64,7 +66,9 @@ fun HomePage(){
 //                    containerColor = Color.Magenta),
                 border = BorderStroke(3.dp, Color.Black),
                 shape = RoundedCornerShape(20),
-            ) {
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
+
+            {
                 Text(text = "Guess - Hints")
             }
         }
@@ -77,7 +81,8 @@ fun HomePage(){
 //                    containerColor = Color.Magenta),
                 border = BorderStroke(3.dp, Color.Black),
                 shape = RoundedCornerShape(20),
-            ) {
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
+            {
                 Text(text = "Guess the Flag")
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -88,8 +93,8 @@ fun HomePage(){
 //                    containerColor = Color.Magenta),
                 border = BorderStroke(3.dp, Color.Black),
                 shape = RoundedCornerShape(20),
-
-            ) {
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
+            {
                 Text(text = "Advanced Level")
             }
         }
