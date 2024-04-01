@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -75,34 +77,26 @@ fun Generate3Flags(list :List<Int>){
     valueFromMap = countriesList.toList()[flagIndex]
     var flagList by remember { mutableStateOf(mutableListOf<Int>()) }
     var correction by remember { mutableStateOf<String>("") }
+    var random2 by remember { mutableStateOf(list.filter { it != flag }.random()) }
+    var random3 by remember { mutableStateOf(list.filter { it != flag && it != random2 }.random()) }
+    var isShuffled by remember { mutableStateOf(false) }
+    var enabled by remember { mutableStateOf(true) }
 
     flagList.add(flag)
-
-    while(true){
-        var random2 = list.random()
-        if(random2 !in flagList){
-            flagList.add(random2)
-            break
-        }
-    }
-
-    while(true) {
-        var random3 = list.random()
-        if (random3 !in flagList) {
-            flagList.add(random3)
-            break
-        }
-    }
-
-
+    flagList.add(random2)
+    flagList.add(random3)
 
 
     //Randomizing the list and assigning them to variables
     //https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/shuffle.html
-    flagList.shuffle()
-    var flag1 = flagList[0]
-    var flag2 = flagList[1]
-    var flag3 = flagList[2]
+    if (isShuffled == false){
+        flagList.shuffle()
+        isShuffled = true
+    }
+
+    var flag1 by remember { mutableStateOf(flagList[0]) }
+    var flag2 by remember { mutableStateOf(flagList[1]) }
+    var flag3 by remember { mutableStateOf(flagList[2]) }
 
     //Logs to check random flags
     Log.d(flag1.toString(), "flag1")
@@ -126,6 +120,7 @@ fun Generate3Flags(list :List<Int>){
             modifier =  Modifier.fillMaxWidth()
         ){
 //            var flag1Index=(list.indexOf(flag))
+
             val imageModifier = Modifier
                 .padding(10.dp)
                 .border(BorderStroke(6.dp, Color.Black))
@@ -133,11 +128,14 @@ fun Generate3Flags(list :List<Int>){
                 .height(150.dp)
                 .fillMaxSize()
                 .clickable {
+
                     if (countriesList.toList()[(list.indexOf(flag1))] == valueFromMap) {
                         correction = "Correct!"
                     } else {
                         correction = "Wrong!"
                     }
+
+                    flagList.clear()
                 }
 
             Image(
@@ -162,6 +160,8 @@ fun Generate3Flags(list :List<Int>){
                     } else {
                         correction = "Wrong!"
                     }
+                    flagList.clear()
+
                 }
 
             Image(
@@ -186,9 +186,12 @@ fun Generate3Flags(list :List<Int>){
                     } else {
                         correction = "Wrong!"
                     }
-                }
+                    flagList.clear()
 
+                }
+            Log.e(flag3.toString(),"flag3")
             Image(
+
                 painter = painterResource(id = flag3),
                 contentDescription = " ",
                 contentScale = ContentScale.FillBounds,
@@ -214,6 +217,34 @@ fun Generate3Flags(list :List<Int>){
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                 )
+            }
+        }
+
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Button(
+                onClick = {
+                    flagList.clear()
+                    flag = (list.random())
+                    flagIndex = (list.indexOf(flag))
+                    valueFromMap = countriesList.toList()[flagIndex]
+                    correction = ""
+                    random2 = list.filter { it != flag }.random()
+                    random3 = list.filter { it != flag && it != random2 }.random()
+                    isShuffled = false
+                    flagList.add(flag)
+                    flagList.add(random2)
+                    flagList.add(random3)
+
+                    flag1 = (flagList[0])
+                    flag2 = (flagList[1])
+                    flag3 = (flagList[2])
+
+                },
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
+            ) {
+                Text(text = "Next")
             }
         }
     }
