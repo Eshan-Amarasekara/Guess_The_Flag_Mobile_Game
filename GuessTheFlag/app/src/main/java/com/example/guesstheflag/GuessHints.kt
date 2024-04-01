@@ -1,6 +1,7 @@
 package com.example.guesstheflag
 
 import android.os.Bundle
+import android.text.style.BackgroundColorSpan
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,10 +25,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,6 +49,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.*
+import androidx.compose.foundation.text.BasicTextField
+
 import com.example.guesstheflag.ui.theme.GuessTheFlagTheme
 
 class GuessHints : ComponentActivity() {
@@ -126,9 +132,10 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
         var correctAnswer by remember { mutableStateOf<String>("") }
         var correctAnswerText by remember { mutableStateOf<String>("") }
         var valueFromMap by remember { mutableStateOf<String>("") }
-        var dashList = mutableListOf<String>()
-        var letterList = mutableListOf<Char>()
+        var dashList by remember{ mutableStateOf( mutableListOf<String>()) }
+        var letterList by remember { mutableStateOf( mutableListOf<Char>()) }
         var userGuess by remember { mutableStateOf("") }
+        var wrongCount by remember { mutableStateOf<Int>(3) }
 
 
 
@@ -136,12 +143,14 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
         Row(modifier= Modifier.align(Alignment.CenterHorizontally)) {
 //            flagIndex = remember { list.indexOf(flag) }
             valueFromMap = countriesList.toList()[flagIndex]
-            letterList = valueFromMap.toMutableList()
-            for (letter in letterList){
-                if(letter == ' '){
-                    dashList.add(' '.toString())
-                }else{
-                    dashList.add('-'.toString())
+            letterList = valueFromMap.lowercase().toMutableList()
+            if(letterList.size != dashList.size) {
+                for (letter in letterList) {
+                    if (letter == ' ') {
+                        dashList.add(' '.toString())
+                    } else {
+                        dashList.add('-'.toString())
+                    }
                 }
             }
             Log.d(flagIndex.toString(), "GenerateRandomFlag: ")
@@ -183,10 +192,8 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
 
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center) {
-            userGuess = SimpleFilledTextFieldSample()
-            for (dash in dashList){
-                
-            }
+            userGuess = userGuesses()
+
         }
 
 
@@ -205,16 +212,35 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
                         val flag2 = list.random()
                         flag = flag2
                         flagIndex = list.indexOf(flag)
+                        dashList.clear()
+                        letterList.clear()
+                        wrongCount=3
 
                     }else{
-//                        if (valueFromMap == selectedCountry) {
-//                            correction = "Correct!"
-//                        } else {
-//                            correction = "Wrong!"
-//                        }
-                        buttonText = "Next"
-                        correctAnswer = valueFromMap
-                        correctAnswerText+="Correct Answer is:"
+                        for (i in 0..<(letterList.size)){
+                            if(userGuess == letterList[i].toString()){
+                                dashList[i] = userGuess
+                                Log.d(dashList.toString(),"updated list")
+
+                            }
+                        }
+
+                        if(userGuess !in letterList.toString()){
+                            wrongCount-=1
+                        }
+
+
+                        if ((wrongCount == 0) || "-" !in dashList){
+                            buttonText = "Next"
+                            correctAnswer = valueFromMap
+                            correctAnswerText+="Correct Answer is:"
+                            if(wrongCount==0){
+                                correction = "Wrong!"
+                            }else{
+                                correction = "Correct!"
+                            }
+
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
@@ -223,9 +249,17 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
             }
 
         }
+
+        Row (modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ){
+            Text(text = "You have $wrongCount chances left to answer wrong")
+        }
+
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
+
             if(correction == "Correct!") {
                 Text(text = correction,
                     style = TextStyle(color = Color.Green, fontStyle = FontStyle.Italic),
@@ -241,24 +275,39 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
             }
         }
 
-        Row{
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
             //Text added separately to add blue color only to the correct country part
             Text(text= correctAnswerText)
-            Text(text = correctAnswer,style = TextStyle(color = Color.Blue))
+            Text(text = correctAnswer,style = TextStyle(color = Color.Blue),
+                fontWeight = FontWeight.Bold)
         }
     }
 }
 
 //https://developer.android.com/develop/ui/compose/text/user-input
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleFilledTextFieldSample(): String {
+fun userGuesses(): String {
     var guessInput by remember { mutableStateOf("") }
 
     TextField(
         value = guessInput,
+
         //https://stackoverflow.com/questions/67136058/textfield-maxlength-android-jetpack-compose
         onValueChange = {if (it.length <= 1) guessInput = it.lowercase() },
-        label = { Text("Label") }
+        label = { Text("Input Guess:", style = TextStyle(fontWeight = FontWeight.Bold)) },
+        //https://www.kodeco.com/38708142-jetpack-compose-getting-started/lessons/13
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color(235, 127, 0),
+            focusedContainerColor = Color(235, 127, 0).copy(alpha = 0.2f),
+            focusedLabelColor = Color(235, 127, 0),
+            unfocusedContainerColor = Color(240,240,240)
+
+        )
+
+
     )
 
     return guessInput
