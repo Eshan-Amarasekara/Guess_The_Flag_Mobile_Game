@@ -78,7 +78,9 @@ fun HomePage(){
         Spacer(modifier = Modifier.height(16.dp))
 
         Row{
-            Button(onClick = {},modifier=Modifier
+            Button(onClick = {
+                var i = Intent(context, GuessTheFlag::class.java)
+                context.startActivity(i)},modifier=Modifier
                 .width(130.dp),
 //                colors = ButtonDefaults.buttonColors(
 //                    containerColor = Color.Black),
