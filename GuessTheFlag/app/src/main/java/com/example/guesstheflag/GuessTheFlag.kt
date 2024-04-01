@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -80,7 +81,7 @@ fun Generate3Flags(list :List<Int>){
     var random2 by remember { mutableStateOf(list.filter { it != flag }.random()) }
     var random3 by remember { mutableStateOf(list.filter { it != flag && it != random2 }.random()) }
     var isShuffled by remember { mutableStateOf(false) }
-    var enabled by remember { mutableStateOf(true) }
+    var isEnabled by remember { mutableStateOf(true) }
 
     flagList.add(flag)
     flagList.add(random2)
@@ -127,7 +128,7 @@ fun Generate3Flags(list :List<Int>){
                 .width(200.dp)
                 .height(150.dp)
                 .fillMaxSize()
-                .clickable {
+                .clickable(enabled = isEnabled) {
 
                     if (countriesList.toList()[(list.indexOf(flag1))] == valueFromMap) {
                         correction = "Correct!"
@@ -136,7 +137,8 @@ fun Generate3Flags(list :List<Int>){
                     }
 
                     flagList.clear()
-                }
+                    isEnabled=false
+                }.alpha(if (isEnabled) 1f else 0.5f)
 
             Image(
                 painter = painterResource(id = flag1),
@@ -154,15 +156,16 @@ fun Generate3Flags(list :List<Int>){
                 .width(200.dp)
                 .height(150.dp)
                 .fillMaxSize()
-                .clickable {
+                .clickable(enabled = isEnabled) {
                     if (countriesList.toList()[(list.indexOf(flag2))] == valueFromMap) {
                         correction = "Correct!"
                     } else {
                         correction = "Wrong!"
                     }
                     flagList.clear()
+                    isEnabled=false
 
-                }
+                }.alpha(if (isEnabled) 1f else 0.5f)
 
             Image(
                 painter = painterResource(id = flag2),
@@ -180,15 +183,16 @@ fun Generate3Flags(list :List<Int>){
                 .width(200.dp)
                 .height(150.dp)
                 .fillMaxSize()
-                .clickable {
+                .clickable(enabled = isEnabled) {
                     if (countriesList.toList()[(list.indexOf(flag3))] == valueFromMap) {
                         correction = "Correct!"
                     } else {
                         correction = "Wrong!"
                     }
                     flagList.clear()
+                    isEnabled=false
 
-                }
+                }.alpha(if (isEnabled) 1f else 0.5f)
             Log.e(flag3.toString(),"flag3")
             Image(
 
@@ -240,7 +244,7 @@ fun Generate3Flags(list :List<Int>){
                     flag1 = (flagList[0])
                     flag2 = (flagList[1])
                     flag3 = (flagList[2])
-
+                    isEnabled = true
                 },
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
             ) {
