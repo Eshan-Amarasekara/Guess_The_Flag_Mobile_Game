@@ -68,14 +68,18 @@ class GuessTheCountry : ComponentActivity() {
 fun GenerateRandomFlag(list : List<Int>) {
     Column() {
         var selectedCountry by remember { mutableStateOf<String?>(null) }
-        var flagIndex by remember { mutableIntStateOf(0) }
         var correction by remember { mutableStateOf<String>("") }
         var buttonText by remember { mutableStateOf<String>("Submit") }
+        var flag by remember { mutableIntStateOf(list.random()) }
+        var flagIndex by remember { mutableIntStateOf(list.indexOf(flag)) }
+        var correctAnswer by remember { mutableStateOf<String>("") }
+        var correctAnswerText by remember { mutableStateOf<String>("") }
+        var valueFromMap by remember { mutableStateOf<String>("") }
+
 
         Row(modifier= Modifier.align(Alignment.CenterHorizontally)) {
-            var flag by remember { mutableIntStateOf(0) }
-            flag = remember { list.random() }
-            flagIndex = remember { list.indexOf(flag) }
+//            flagIndex = remember { list.indexOf(flag) }
+            valueFromMap = countriesList.toList()[flagIndex]
             Log.d(flagIndex.toString(), "GenerateRandomFlag: ")
             val imageModifier = Modifier
                 .padding(20.dp)
@@ -95,7 +99,6 @@ fun GenerateRandomFlag(list : List<Int>) {
 
 
         Row {
-
             LazyColumn(
                 modifier = Modifier
                     .height(300.dp)
@@ -104,14 +107,14 @@ fun GenerateRandomFlag(list : List<Int>) {
 
             ) {
                 //Generating answers by mapping values into clickable boxes
-                items(countriesList.values.toList()) { countryName ->
+                items(countriesList) { countryName ->
                     val isSelected = countryName == selectedCountry
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
                                 if (isSelected) Color(235, 127, 0) else Color.White,
-                                shape = RoundedCornerShape(18.dp) // Set border radius here
+                                shape = RoundedCornerShape(18.dp) // Setting border radius
                             )
                             .clickable(onClick = { selectedCountry = countryName })
                             .border(
@@ -125,10 +128,10 @@ fun GenerateRandomFlag(list : List<Int>) {
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Left,
-                            color = if (isSelected) Color.White else Color.Black, // Change Color.Red to your desired color
+                            color = if (isSelected) Color.White else Color.Black, // Changing Colors if Selected
                             modifier = Modifier
-                                .fillMaxWidth() // Ensure text does not overflow horizontally
-                                .padding(horizontal = 16.dp) // Add padding to prevent overflow
+                                .fillMaxWidth() // Ensures that text does not overflow horizontally
+                                .padding(horizontal = 16.dp) // Adding padding to prevent overflow
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp)) // Add space between boxes
@@ -143,14 +146,27 @@ fun GenerateRandomFlag(list : List<Int>) {
 
             Button(
                 onClick = {
+                    if (buttonText == "Next") {
+                        selectedCountry =null
+                        correction = ""
+                        buttonText = "Submit"
+                        correctAnswer = ""
+                        correctAnswerText = ""
+                        valueFromMap=""
+                        val flag2 = list.random()
+                        flag = flag2
+                        flagIndex = list.indexOf(flag)
 
-                        var valueFromMap = countriesList.toList()[flagIndex].second
+                    }else{
                         if (valueFromMap == selectedCountry) {
                             correction = "Correct!"
                         } else {
                             correction = "Wrong!"
                         }
-                    buttonText = "Next"
+                        buttonText = "Next"
+                        correctAnswer = valueFromMap
+                        correctAnswerText+="Correct Answer is:"
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
             ) {
@@ -174,6 +190,12 @@ fun GenerateRandomFlag(list : List<Int>) {
                     fontWeight = FontWeight.Bold,
                 )
             }
+        }
+
+        Row{
+            //Text added separately to add blue color only to the correct country part
+            Text(text= correctAnswerText)
+            Text(text = correctAnswer,style = TextStyle(color = Color.Blue))
         }
     }
 }
@@ -217,40 +239,34 @@ GenerateRandomFlag(CountryCodes)
 
 
 
-val countriesList = mapOf(
-    "AD" to "Andorra", "AE" to "United Arab Emirates", "AF" to "Afghanistan", "AG" to "Antigua and Barbuda",
-    "AI" to "Anguilla", "AL" to "Albania", "AM" to "Armenia", "AO" to "Angola", "AQ" to "Antarctica", "AR" to "Argentina", "AS" to "American Samoa", "AT" to "Austria",
-    "AU" to "Australia", "AW" to "Aruba", "AX" to "\u00c5land Islands", "AZ" to "Azerbaijan", "BA" to "Bosnia and Herzegovina", "BB" to "Barbados", "BD" to "Bangladesh", "BE" to "Belgium",
-    "BF" to "Burkina Faso", "BG" to "Bulgaria", "BH" to "Bahrain", "BI" to "Burundi", "BJ" to "Benin", "BL" to "Saint Barthélemy", "BM" to "Bermuda", "BN" to "Brunei Darussalam",
-    "BO" to "Bolivia, Plurinational State of", "BQ" to "Caribbean Netherlands", "BR" to "Brazil", "BS" to "Bahamas", "BT" to "Bhutan", "BV" to "Bouvet Island", "BW" to "Botswana", "BY" to "Belarus",
-    "BZ" to "Belize", "CA" to "Canada", "CC" to "Cocos (Keeling) Islands", "CD" to "Congo", "CF" to "Central African Republic", "CG" to "Republic of the Congo", "CH" to "Switzerland", "CI" to "C\u00f4te d'Ivoire",
-    "CK" to "Cook Islands", "CL" to "Chile", "CM" to "Cameroon", "CN" to "China", "CO" to "Colombia", "CR" to "Costa Rica", "CU" to "Cuba", "CV" to "Cape Verde",
-    "CW" to "Cura\u00e7ao", "CX" to "Christmas Island", "CY" to "Cyprus", "CZ" to "Czech Republic", "DE" to "Germany", "DJ" to "Djibouti", "DK" to "Denmark", "DM" to "Dominica",
-    "DZ" to "Algeria", "EC" to "Ecuador", "EE" to "Estonia", "EG" to "Egypt", "EH" to "Western Sahara", "ER" to "Eritrea", "ES" to "Spain", "ET" to "Ethiopia",
-    "EU" to "Europe", "FI" to "Finland", "FJ" to "Fiji", "FK" to "Falkland Islands", "FM" to "Micronesia", "FO" to "Faroe Islands", "FR" to "France", "GA" to "Gabon",
-    "GB" to "United Kingdom", "GB-ENG" to "England", "GB-NIR" to "Northern Ireland", "GB-SCT" to "Scotland", "GB-WLS" to "Wales", "GD" to "Grenada", "GE" to "Georgia", "GF" to "French Guiana",
-    "GG" to "Guernsey", "GH" to "Ghana", "GI" to "Gibraltar", "GL" to "Greenland", "GM" to "Gambia", "GN" to "Guinea", "GP" to "Guadeloupe", "GQ" to "Equatorial Guinea",
-    "GR" to "Greece", "GS" to "South Georgia and the South Sandwich Islands", "GT" to "Guatemala", "GU" to "Guam", "GW" to "Guinea-Bissau", "GY" to "Guyana", "HK" to "Hong Kong",
-    "HM" to "Heard Island and McDonald Islands", "HN" to "Honduras", "HR" to "Croatia", "HT" to "Haiti", "HU" to "Hungary", "ID" to "Indonesia", "IE" to "Ireland",
-    "IL" to "Israel", "IM" to "Isle of Man", "IN" to "India", "IO" to "British Indian Ocean Territory", "IQ" to "Iraq", "IR" to "Iran, Islamic Republic of", "IS" to "Iceland", "IT" to "Italy",
-    "JE" to "Jersey", "JM" to "Jamaica", "JO" to "Jordan", "JP" to "Japan", "KE" to "Kenya", "KG" to "Kyrgyzstan", "KH" to "Cambodia", "KI" to "Kiribati",
-    "KM" to "Comoros", "KN" to "Saint Kitts and Nevis", "KP" to "Korea", "KR" to "Korea, Republic of", "KW" to "Kuwait", "KY" to "Cayman Islands", "KZ" to "Kazakhstan", "LA" to "Laos ",
-    "LB" to "Lebanon", "LC" to "Saint Lucia", "LI" to "Liechtenstein", "LK" to "Sri Lanka", "LR" to "Liberia", "LS" to "Lesotho", "LT" to "Lithuania", "LU" to "Luxembourg",
-    "LV" to "Latvia", "LY" to "Libya", "MA" to "Morocco", "MC" to "Monaco", "MD" to "Moldova, Republic of", "ME" to "Montenegro", "MF" to "Saint Martin", "MG" to "Madagascar",
-    "MH" to "Marshall Islands", "MK" to "North Macedonia", "ML" to "Mali", "MM" to "Myanmar", "MN" to "Mongolia", "MO" to "Macao", "MP" to "Northern Mariana Islands", "MQ" to "Martinique",
-    "MR" to "Mauritania", "MS" to "Montserrat", "MT" to "Malta", "MU" to "Mauritius", "MV" to "Maldives", "MW" to "Malawi", "MX" to "Mexico", "MY" to "Malaysia",
-    "MZ" to "Mozambique", "NA" to "Namibia", "NC" to "New Caledonia", "NE" to "Niger", "NF" to "Norfolk Island", "NG" to "Nigeria", "NI" to "Nicaragua", "NL" to "Netherlands",
-    "NO" to "Norway", "NP" to "Nepal", "NR" to "Nauru", "NU" to "Niue", "NZ" to "New Zealand", "OM" to "Oman", "PA" to "Panama", "PE" to "Peru",
-    "PF" to "French Polynesia", "PG" to "Papua New Guinea", "PH" to "Philippines", "PK" to "Pakistan", "PL" to "Poland", "PM" to "Saint Pierre and Miquelon", "PN" to "Pitcairn", "PR" to "Puerto Rico",
-    "PS" to "Palestine", "PT" to "Portugal", "PW" to "Palau", "PY" to "Paraguay", "QA" to "Qatar", "RE" to "Réunion", "RO" to "Romania", "RS" to "Serbia",
-    "RU" to "Russian Federation", "RW" to "Rwanda", "SA" to "Saudi Arabia", "SB" to "Solomon Islands", "SC" to "Seychelles", "SD" to "Sudan", "SE" to "Sweden", "SG" to "Singapore",
-    "SH" to "Saint Helena, Ascension and Tristan da Cunha", "SI" to "Slovenia", "SJ" to "Svalbard and Jan Mayen Islands", "SK" to "Slovakia", "SL" to "Sierra Leone", "SM" to "San Marino", "SN" to "Senegal",
-    "SO" to "Somalia", "SR" to "Suriname", "SS" to "South Sudan", "ST" to "Sao Tome and Principe", "SV" to "El Salvador", "SX" to "Sint Maarten (Dutch part)", "SY" to "Syrian Arab Republic", "SZ" to "Swaziland",
-    "TC" to "Turks and Caicos Islands", "TD" to "Chad", "TF" to "French Southern Territories", "TG" to "Togo", "TH" to "Thailand", "TJ" to "Tajikistan", "TK" to "Tokelau", "TL" to "Timor-Leste",
-    "TM" to "Turkmenistan", "TN" to "Tunisia", "TO" to "Tonga", "TR" to "Turkey", "TT" to "Trinidad and Tobago", "TV" to "Tuvalu", "TW" to "Taiwan (Republic of China)", "TZ" to "Tanzania, United Republic of",
-    "UA" to "Ukraine", "UG" to "Uganda", "UM" to "US Minor Outlying Islands", "US" to "United States", "UY" to "Uruguay", "UZ" to "Uzbekistan", "VA" to "Holy See (Vatican City State)", "VC" to "Saint Vincent and the Grenadines",
-    "VE" to "Venezuela, Bolivarian Republic of", "VG" to "Virgin Islands, British", "VI" to "Virgin Islands, U.S.", "VN" to "Vietnam", "VU" to "Vanuatu", "WF" to "Wallis and Futuna Islands", "WS" to "Samoa",
-    "XK" to "Kosovo", "YE" to "Yemen", "YT" to "Mayotte", "ZA" to "South Africa", "ZM" to "Zambia", "ZW" to "Zimbabwe"
+val countriesList = listOf(
+    "Andorra", "United Arab Emirates", "Afghanistan", "Antigua and Barbuda", "Anguilla", "Albania", "Armenia", "Angola", "Antarctica", "Argentina",
+    "American Samoa", "Austria", "Australia", "Aruba", "Åland Islands", "Azerbaijan", "Bosnia and Herzegovina", "Barbados", "Bangladesh", "Belgium",
+    "Burkina Faso", "Bulgaria", "Bahrain", "Burundi", "Benin", "Saint Barthélemy", "Bermuda", "Brunei Darussalam", "Bolivia, Plurinational State of",
+    "Caribbean Netherlands", "Brazil", "Bahamas", "Bhutan", "Bouvet Island", "Botswana", "Belarus", "Belize", "Canada", "Cocos (Keeling) Islands",
+    "Congo", "Central African Republic", "Republic of the Congo", "Switzerland", "Côte d'Ivoire", "Cook Islands", "Chile", "Cameroon", "China",
+    "Colombia", "Costa Rica", "Cuba", "Cape Verde", "Curaçao", "Christmas Island", "Cyprus", "Czech Republic", "Germany", "Djibouti", "Denmark",
+    "Dominica", "Algeria", "Ecuador", "Estonia", "Egypt", "Western Sahara", "Eritrea", "Spain", "Ethiopia", "Europe", "Finland", "Fiji", "Falkland Islands",
+    "Micronesia", "Faroe Islands", "France", "Gabon", "United Kingdom", "England", "Northern Ireland", "Scotland", "Wales", "Grenada", "Georgia",
+    "French Guiana", "Guernsey", "Ghana", "Gibraltar", "Greenland", "Gambia", "Guinea", "Guadeloupe", "Equatorial Guinea", "Greece",
+    "South Georgia and the South Sandwich Islands", "Guatemala", "Guam", "Guinea-Bissau", "Guyana", "Hong Kong", "Heard Island and McDonald Islands",
+    "Honduras", "Croatia", "Haiti", "Hungary", "Indonesia", "Ireland", "Israel", "Isle of Man", "India", "British Indian Ocean Territory", "Iraq",
+    "Iran, Islamic Republic of", "Iceland", "Italy", "Jersey", "Jamaica", "Jordan", "Japan", "Kenya", "Kyrgyzstan", "Cambodia", "Kiribati",
+    "Comoros", "Saint Kitts and Nevis", "Korea", "Korea, Republic of", "Kuwait", "Cayman Islands", "Kazakhstan", "Laos ", "Lebanon",
+    "Saint Lucia", "Liechtenstein", "Sri Lanka", "Liberia", "Lesotho", "Lithuania", "Luxembourg", "Latvia", "Libya", "Morocco", "Monaco",
+    "Moldova, Republic of", "Montenegro", "Saint Martin", "Madagascar", "Marshall Islands", "North Macedonia", "Mali", "Myanmar", "Mongolia",
+    "Macao", "Northern Mariana Islands", "Martinique", "Mauritania", "Montserrat", "Malta", "Mauritius", "Maldives", "Malawi", "Mexico",
+    "Malaysia", "Mozambique", "Namibia", "New Caledonia", "Niger", "Norfolk Island", "Nigeria", "Nicaragua", "Netherlands", "Norway", "Nepal",
+    "Nauru", "Niue", "New Zealand", "Oman", "Panama", "Peru", "French Polynesia", "Papua New Guinea", "Philippines", "Pakistan", "Poland",
+    "Saint Pierre and Miquelon", "Pitcairn", "Puerto Rico", "Palestine", "Portugal", "Palau", "Paraguay", "Qatar", "Réunion", "Romania", "Serbia",
+    "Russian Federation", "Rwanda", "Saudi Arabia", "Solomon Islands", "Seychelles", "Sudan", "Sweden", "Singapore", "Saint Helena, Ascension and Tristan da Cunha",
+    "Slovenia", "Svalbard and Jan Mayen Islands", "Slovakia", "Sierra Leone", "San Marino", "Senegal", "Somalia", "Suriname", "South Sudan",
+    "Sao Tome and Principe", "El Salvador", "Sint Maarten (Dutch part)", "Syrian Arab Republic", "Swaziland", "Turks and Caicos Islands", "Chad",
+    "French Southern Territories", "Togo", "Thailand", "Tajikistan", "Tokelau", "Timor-Leste", "Turkmenistan", "Tunisia", "Tonga", "Turkey",
+    "Trinidad and Tobago", "Tuvalu", "Taiwan (Republic of China)", "Tanzania, United Republic of", "Ukraine", "Uganda", "US Minor Outlying Islands",
+    "United States", "Uruguay", "Uzbekistan", "Holy See (Vatican City State)", "Saint Vincent and the Grenadines", "Venezuela, Bolivarian Republic of",
+    "Virgin Islands, British", "Virgin Islands, U.S.", "Vietnam", "Vanuatu", "Wallis and Futuna Islands", "Samoa", "Kosovo", "Yemen", "Mayotte",
+    "South Africa", "Zambia", "Zimbabwe"
 )
 
 //@Composable

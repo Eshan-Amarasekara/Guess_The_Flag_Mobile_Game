@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">GuessTheFlag</string>
     <string name="title_activity_guess_the_country">GuessTheCountry</string>
+    <string name="title_activity_guess_hints">GuessHints</string>
 </resources>

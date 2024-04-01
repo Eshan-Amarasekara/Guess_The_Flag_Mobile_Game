@@ -60,7 +60,10 @@ fun HomePage(){
             }
             Spacer(modifier = Modifier.width(16.dp))
 
-            Button(onClick = {},modifier=Modifier
+            Button(onClick = {
+                var i = Intent(context, GuessHints::class.java)
+                context.startActivity(i)
+            },modifier=Modifier
                 .width(130.dp),
 //                colors = ButtonDefaults.buttonColors(
 //                    containerColor = Color.Black),
@@ -101,7 +104,6 @@ fun HomePage(){
     }
 
 }
-
 
 @Preview(showBackground = true)
 @Composable
