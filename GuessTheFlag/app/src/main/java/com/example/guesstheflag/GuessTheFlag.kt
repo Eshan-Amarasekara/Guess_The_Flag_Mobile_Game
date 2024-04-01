@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -37,7 +34,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.guesstheflag.ui.theme.GuessTheFlagTheme
 
 class GuessTheFlag : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,28 +44,28 @@ class GuessTheFlag : ComponentActivity() {
     }
 }
 
-@Composable
-fun generateNewFlag(flag:Int){
-
-    val imageModifier = Modifier
-        .padding(10.dp)
-        .border(BorderStroke(6.dp, Color.Black))
-        .width(200.dp)
-        .height(150.dp)
-        .fillMaxSize()
-        .clickable {
-            
-        }
-
-    Image(
-        painter = painterResource(id = flag),
-        contentDescription = " ",
-        contentScale = ContentScale.FillBounds,
-        modifier = imageModifier
-
-    )
-
-}
+//@Composable
+//fun generateNewFlag(flag:Int){
+//
+//    val imageModifier = Modifier
+//        .padding(10.dp)
+//        .border(BorderStroke(6.dp, Color.Black))
+//        .width(200.dp)
+//        .height(150.dp)
+//        .fillMaxSize()
+//        .clickable {
+//
+//        }
+//
+//    Image(
+//        painter = painterResource(id = flag),
+//        contentDescription = " ",
+//        contentScale = ContentScale.FillBounds,
+//        modifier = imageModifier
+//
+//    )
+//
+//}
 
 @Composable
 fun Generate3Flags(list :List<Int>){
@@ -78,10 +74,28 @@ fun Generate3Flags(list :List<Int>){
     var valueFromMap by remember { mutableStateOf<String>("") }
     valueFromMap = countriesList.toList()[flagIndex]
     var flagList by remember { mutableStateOf(mutableListOf<Int>()) }
+    var correction by remember { mutableStateOf<String>("") }
 
     flagList.add(flag)
-    flagList.add(list.random())
-    flagList.add(list.random())
+
+    while(true){
+        var random2 = list.random()
+        if(random2 !in flagList){
+            flagList.add(random2)
+            break
+        }
+    }
+
+    while(true) {
+        var random3 = list.random()
+        if (random3 !in flagList) {
+            flagList.add(random3)
+            break
+        }
+    }
+
+
+
 
     //Randomizing the list and assigning them to variables
     //https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/shuffle.html
@@ -111,13 +125,96 @@ fun Generate3Flags(list :List<Int>){
         Row(horizontalArrangement = Arrangement.Center,
             modifier =  Modifier.fillMaxWidth()
         ){
-            generateNewFlag(flag1)
+//            var flag1Index=(list.indexOf(flag))
+            val imageModifier = Modifier
+                .padding(10.dp)
+                .border(BorderStroke(6.dp, Color.Black))
+                .width(200.dp)
+                .height(150.dp)
+                .fillMaxSize()
+                .clickable {
+                    if (countriesList.toList()[(list.indexOf(flag1))] == valueFromMap) {
+                        correction = "Correct!"
+                    } else {
+                        correction = "Wrong!"
+                    }
+                }
+
+            Image(
+                painter = painterResource(id = flag1),
+                contentDescription = " ",
+                contentScale = ContentScale.FillBounds,
+                modifier = imageModifier
+
+            )
+
         }
         Row(modifier= Modifier.align(Alignment.CenterHorizontally)){
-            generateNewFlag(flag2)
+            val imageModifier = Modifier
+                .padding(10.dp)
+                .border(BorderStroke(6.dp, Color.Black))
+                .width(200.dp)
+                .height(150.dp)
+                .fillMaxSize()
+                .clickable {
+                    if (countriesList.toList()[(list.indexOf(flag2))] == valueFromMap) {
+                        correction = "Correct!"
+                    } else {
+                        correction = "Wrong!"
+                    }
+                }
+
+            Image(
+                painter = painterResource(id = flag2),
+                contentDescription = " ",
+                contentScale = ContentScale.FillBounds,
+                modifier = imageModifier
+
+            )
+
         }
         Row(modifier= Modifier.align(Alignment.CenterHorizontally)){
-            generateNewFlag(flag3)
+            val imageModifier = Modifier
+                .padding(10.dp)
+                .border(BorderStroke(6.dp, Color.Black))
+                .width(200.dp)
+                .height(150.dp)
+                .fillMaxSize()
+                .clickable {
+                    if (countriesList.toList()[(list.indexOf(flag3))] == valueFromMap) {
+                        correction = "Correct!"
+                    } else {
+                        correction = "Wrong!"
+                    }
+                }
+
+            Image(
+                painter = painterResource(id = flag3),
+                contentDescription = " ",
+                contentScale = ContentScale.FillBounds,
+                modifier = imageModifier
+
+            )
+
+        }
+
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+
+            if(correction == "Correct!") {
+                Text(text = correction,
+                    style = TextStyle(color = Color.Green, fontStyle = FontStyle.Italic),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }else if(correction == "Wrong!"){
+                Text(text = correction,
+                    style = TextStyle(color = Color.Red, fontStyle = FontStyle.Italic),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
     }
 }
