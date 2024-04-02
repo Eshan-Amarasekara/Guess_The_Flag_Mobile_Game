@@ -73,21 +73,24 @@ fun GenerateRandomFlags(list :List<Int>) {
     var is2Correct by remember { mutableStateOf<Boolean?>(null) }
     var is3Correct by remember { mutableStateOf<Boolean?>(null) }
     var tries by remember { mutableStateOf<Int>(3) }
-    val textField1Color by remember { mutableStateOf(when (is1Correct) {
+    var textField1Color by remember { mutableStateOf(when (is1Correct) {
         true -> Color.Green
         false -> Color.Red
         null -> Color.White
     })}
-    val textField2Color by remember { mutableStateOf(when (is2Correct) {
+    var textField2Color by remember { mutableStateOf(when (is2Correct) {
         true -> Color.Green
         false -> Color.Red
         null -> Color.White
     })}
-    val textField3Color by remember { mutableStateOf(when (is3Correct) {
+    var textField3Color by remember { mutableStateOf(when (is3Correct) {
         true -> Color.Green
         false -> Color.Red
         null -> Color.White
     })}
+    var is1Enabled by remember { mutableStateOf(true) }
+    var is2Enabled by remember { mutableStateOf(true) }
+    var is3Enabled by remember { mutableStateOf(true) }
 
 
     flagList.add(flag)
@@ -135,13 +138,15 @@ fun GenerateRandomFlags(list :List<Int>) {
                 //https://stackoverflow.com/questions/67136058/textfield-maxlength-android-jetpack-compose
                 onValueChange = {guessInput1 = it },
                 label = { Text("Input Guess:", style = TextStyle(fontWeight = FontWeight.Bold)) },
-
+                enabled=(is1Enabled),
                 //https://www.kodeco.com/38708142-jetpack-compose-getting-started/lessons/13
                 colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color(235, 127, 0),
-                    focusedContainerColor = textField1Color,
+                    focusedIndicatorColor = Color(235, 127, 0) ,
+                    focusedContainerColor = Color(235, 127, 0).copy(alpha = 0.2f),
                     focusedLabelColor = Color(235, 127, 0),
-                    unfocusedContainerColor = textField1Color
+                    unfocusedContainerColor = textField1Color,
+                    disabledTextColor = Color.Green,
+                    disabledIndicatorColor = Color.Green.copy(alpha = 0.2f)
 
                 ), modifier = Modifier.align(Alignment.CenterVertically),
                 )
@@ -172,13 +177,16 @@ fun GenerateRandomFlags(list :List<Int>) {
                 //https://stackoverflow.com/questions/67136058/textfield-maxlength-android-jetpack-compose
                 onValueChange = {guessInput2 = it},
                 label = { Text("Input Guess:", style = TextStyle(fontWeight = FontWeight.Bold)) },
+                enabled=(is2Enabled),
 
                 //https://www.kodeco.com/38708142-jetpack-compose-getting-started/lessons/13
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color(235, 127, 0),
                     focusedContainerColor = Color(235, 127, 0).copy(alpha = 0.2f),
                     focusedLabelColor = Color(235, 127, 0),
-                    unfocusedContainerColor = textField2Color
+                    unfocusedContainerColor = textField2Color,
+                    disabledTextColor = Color.Green,
+                    disabledIndicatorColor = Color.Green.copy(alpha = 0.2f)
 
                 ), modifier = Modifier.align(Alignment.CenterVertically),
             )
@@ -209,13 +217,16 @@ fun GenerateRandomFlags(list :List<Int>) {
                 //https://stackoverflow.com/questions/67136058/textfield-maxlength-android-jetpack-compose
                 onValueChange = {guessInput3 = it},
                 label = { Text("Input Guess:", style = TextStyle(fontWeight = FontWeight.Bold)) },
+                enabled=(is3Enabled),
 
                 //https://www.kodeco.com/38708142-jetpack-compose-getting-started/lessons/13
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color(235, 127, 0),
                     focusedContainerColor = Color(235, 127, 0).copy(alpha = 0.2f),
                     focusedLabelColor = Color(235, 127, 0),
-                    unfocusedContainerColor = textField3Color
+                    unfocusedContainerColor = textField3Color,
+                    disabledTextColor = Color.Green,
+                    disabledIndicatorColor = Color.Green.copy(alpha = 0.2f)
 
                 ), modifier = Modifier.align(Alignment.CenterVertically),
             )
@@ -223,29 +234,95 @@ fun GenerateRandomFlags(list :List<Int>) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row {
+        Row (modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ){
             Button(onClick = {
                 if (buttonText == "Next") {
+                    flag = list.random()
+                    flagIndex =(list.indexOf(flag))
+                    valueFromMap =""
+                    valueFromMap = countriesList.toList()[flagIndex]
+                    flagList = mutableListOf<Int>()
+                    correction=""
+                    random2 = (list.filter { it != flag }.random())
+                    random3 = (list.filter { it != flag && it != random2 }.random())
+                    isShuffled =false
+                    guessInput1 =""
+                    guessInput2 =""
+                    guessInput3 =""
+                    buttonText = "Submit"
+                    is1Correct = null
+                    is2Correct = null
+                    is3Correct = null
+                    tries =3
+                    flagList.add(flag)
+                    flagList.add(random2)
+                    flagList.add(random3)
+                    is1Enabled=true
+                    is2Enabled=true
+                    is3Enabled=true
+                    if (isShuffled == false) {
+                        flagList.shuffle()
+                        isShuffled = true
+                    }
 
+                    flag1 =(flagList[0])
+                    flag2 =(flagList[1])
+                    flag3 =(flagList[2])
+
+                    textField1Color =(when (is1Correct) {
+                        true -> Color.Green
+                        false -> Color.Red
+                        null -> Color.White
+                    })
+                    textField2Color =(when (is2Correct) {
+                        true -> Color.Green
+                        false -> Color.Red
+                        null -> Color.White
+                    })
+                    textField3Color =(when (is3Correct) {
+                        true -> Color.Green
+                        false -> Color.Red
+                        null -> Color.White
+                    })
                 } else {
                     if (countriesList.toList()[(list.indexOf(flag1))] == guessInput1) {
                         is1Correct = true
+                        is1Enabled=false
                     } else {
                         is1Correct = false
                     }
+                    textField1Color =(when (is1Correct) {
+                        true -> Color.Green
+                        false -> Color.Red
+                        null -> Color.White
+                    })
 
                     if (countriesList.toList()[(list.indexOf(flag2))] == guessInput2) {
                         is2Correct = true
+                        is2Enabled=false
+
                     } else {
                         is2Correct = false
                     }
-
+                    textField2Color =(when (is2Correct) {
+                        true -> Color.Green
+                        false -> Color.Red
+                        null -> Color.White
+                    })
                     if (countriesList.toList()[(list.indexOf(flag3))] == guessInput3) {
                         is3Correct = true
+                        is3Enabled=false
+
                     } else {
                         is3Correct = false
                     }
-
+                    textField3Color =(when (is3Correct) {
+                        true -> Color.Green
+                        false -> Color.Red
+                        null -> Color.White
+                    })
                     if (is1Correct == false || is2Correct == false || is3Correct == false) {
                         tries -= 1
                     }
@@ -257,8 +334,6 @@ fun GenerateRandomFlags(list :List<Int>) {
                         correction = "Wrong!"
                         buttonText = "Next"
                     }
-
-
                 }
                              },
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
