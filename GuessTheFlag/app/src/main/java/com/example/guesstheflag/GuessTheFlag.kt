@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -24,7 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,16 +74,16 @@ class GuessTheFlag : ComponentActivity() {
 
 @Composable
 fun Generate3Flags(list :List<Int>){
-    var flag by remember { mutableIntStateOf(list.random()) }
-    var flagIndex by remember { mutableIntStateOf(list.indexOf(flag)) }
-    var valueFromMap by remember { mutableStateOf<String>("") }
+    var flag by rememberSaveable { mutableIntStateOf(list.random()) }
+    var flagIndex by rememberSaveable { mutableIntStateOf(list.indexOf(flag)) }
+    var valueFromMap by rememberSaveable { mutableStateOf<String>("") }
     valueFromMap = countriesList.toList()[flagIndex]
-    var flagList by remember { mutableStateOf(mutableListOf<Int>()) }
-    var correction by remember { mutableStateOf<String>("") }
-    var random2 by remember { mutableStateOf(list.filter { it != flag }.random()) }
-    var random3 by remember { mutableStateOf(list.filter { it != flag && it != random2 }.random()) }
-    var isShuffled by remember { mutableStateOf(false) }
-    var isEnabled by remember { mutableStateOf(true) }
+    var flagList by rememberSaveable { mutableStateOf(mutableListOf<Int>()) }
+    var correction by rememberSaveable { mutableStateOf<String>("") }
+    var random2 by rememberSaveable { mutableStateOf(list.filter { it != flag }.random()) }
+    var random3 by rememberSaveable { mutableStateOf(list.filter { it != flag && it != random2 }.random()) }
+    var isShuffled by rememberSaveable { mutableStateOf(false) }
+    var isEnabled by rememberSaveable { mutableStateOf(true) }
 
     flagList.add(flag)
     flagList.add(random2)
@@ -95,9 +97,9 @@ fun Generate3Flags(list :List<Int>){
         isShuffled = true
     }
 
-    var flag1 by remember { mutableStateOf(flagList[0]) }
-    var flag2 by remember { mutableStateOf(flagList[1]) }
-    var flag3 by remember { mutableStateOf(flagList[2]) }
+    var flag1 by rememberSaveable { mutableStateOf(flagList[0]) }
+    var flag2 by rememberSaveable { mutableStateOf(flagList[1]) }
+    var flag3 by rememberSaveable { mutableStateOf(flagList[2]) }
 
     //Logs to check random flags
     Log.d(flag1.toString(), "flag1")
@@ -107,7 +109,8 @@ fun Generate3Flags(list :List<Int>){
 
 
 
-    Column (){
+    Column (modifier = Modifier
+        .verticalScroll(rememberScrollState())){
         Row(modifier= Modifier.align(Alignment.CenterHorizontally)){
             Text(text = "$valueFromMap",
                 style = TextStyle (),
@@ -237,10 +240,14 @@ fun Generate3Flags(list :List<Int>){
                     random2 = list.filter { it != flag }.random()
                     random3 = list.filter { it != flag && it != random2 }.random()
                     isShuffled = false
+
                     flagList.add(flag)
                     flagList.add(random2)
                     flagList.add(random3)
-
+                    if (isShuffled == false){
+                        flagList.shuffle()
+                        isShuffled = true
+                    }
                     flag1 = (flagList[0])
                     flag2 = (flagList[1])
                     flag3 = (flagList[2])

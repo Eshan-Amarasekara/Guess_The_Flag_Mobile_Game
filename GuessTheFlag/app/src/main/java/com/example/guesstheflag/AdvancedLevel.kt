@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,12 +15,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -30,21 +28,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.guesstheflag.ui.theme.GuessTheFlagTheme
 
 class AdvancedLevel : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,24 +52,24 @@ class AdvancedLevel : ComponentActivity() {
 
 @Composable
 fun GenerateRandomFlags(list :List<Int>) {
-    var flag by remember { mutableIntStateOf(list.random()) }
-    var flagIndex by remember { mutableIntStateOf(list.indexOf(flag)) }
-    var valueFromMap by remember { mutableStateOf<String>("") }
+    var flag by rememberSaveable { mutableIntStateOf(list.random()) }
+    var flagIndex by rememberSaveable { mutableIntStateOf(list.indexOf(flag)) }
+    var valueFromMap by rememberSaveable { mutableStateOf<String>("") }
 
     valueFromMap = countriesList.toList()[flagIndex]
-    var flagList by remember { mutableStateOf(mutableListOf<Int>()) }
-    var correction by remember { mutableStateOf<String>("") }
-    var random2 by remember { mutableStateOf(list.filter { it != flag }.random()) }
-    var random3 by remember { mutableStateOf(list.filter { it != flag && it != random2 }.random()) }
-    var isShuffled by remember { mutableStateOf(false) }
-    var guessInput1 by remember { mutableStateOf("") }
-    var guessInput2 by remember { mutableStateOf("") }
-    var guessInput3 by remember { mutableStateOf("") }
-    var buttonText by remember { mutableStateOf<String>("Submit") }
-    var is1Correct by remember { mutableStateOf<Boolean?>(null) }
-    var is2Correct by remember { mutableStateOf<Boolean?>(null) }
-    var is3Correct by remember { mutableStateOf<Boolean?>(null) }
-    var tries by remember { mutableStateOf<Int>(3) }
+    var flagList by rememberSaveable { mutableStateOf(mutableListOf<Int>()) }
+    var correction by rememberSaveable { mutableStateOf<String>("") }
+    var random2 by rememberSaveable { mutableStateOf(list.filter { it != flag }.random()) }
+    var random3 by rememberSaveable { mutableStateOf(list.filter { it != flag && it != random2 }.random()) }
+    var isShuffled by rememberSaveable { mutableStateOf(false) }
+    var guessInput1 by rememberSaveable { mutableStateOf("") }
+    var guessInput2 by rememberSaveable { mutableStateOf("") }
+    var guessInput3 by rememberSaveable { mutableStateOf("") }
+    var buttonText by rememberSaveable { mutableStateOf<String>("Submit") }
+    var is1Correct by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var is2Correct by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var is3Correct by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var tries by rememberSaveable { mutableStateOf<Int>(3) }
     var textField1Color by remember { mutableStateOf(when (is1Correct) {
         true -> Color.Green
         false -> Color.Red
@@ -90,16 +85,16 @@ fun GenerateRandomFlags(list :List<Int>) {
         false -> Color.Red
         null -> Color.White
     })}
-    var is1Enabled by remember { mutableStateOf(true) }
-    var is2Enabled by remember { mutableStateOf(true) }
-    var is3Enabled by remember { mutableStateOf(true) }
-    var correctAnswer1Text by remember { mutableStateOf<String>("") }
-    var correctAnswer2Text by remember { mutableStateOf<String>("") }
-    var correctAnswer3Text by remember { mutableStateOf<String>("") }
-    var correctAnswer1Country by remember { mutableStateOf<String>("") }
-    var correctAnswer2Country by remember { mutableStateOf<String>("") }
-    var correctAnswer3Country by remember { mutableStateOf<String>("") }
-    var score by remember { mutableStateOf<Int>(0)}
+    var is1Enabled by rememberSaveable { mutableStateOf(true) }
+    var is2Enabled by rememberSaveable { mutableStateOf(true) }
+    var is3Enabled by rememberSaveable { mutableStateOf(true) }
+    var correctAnswer1Text by rememberSaveable { mutableStateOf<String>("") }
+    var correctAnswer2Text by rememberSaveable { mutableStateOf<String>("") }
+    var correctAnswer3Text by rememberSaveable { mutableStateOf<String>("") }
+    var correctAnswer1Country by rememberSaveable { mutableStateOf<String>("") }
+    var correctAnswer2Country by rememberSaveable { mutableStateOf<String>("") }
+    var correctAnswer3Country by rememberSaveable { mutableStateOf<String>("") }
+    var score by rememberSaveable { mutableStateOf<Int>(0)}
 
 
 
@@ -115,11 +110,12 @@ fun GenerateRandomFlags(list :List<Int>) {
         isShuffled = true
     }
 
-    var flag1 by remember { mutableStateOf(flagList[0]) }
-    var flag2 by remember { mutableStateOf(flagList[1]) }
-    var flag3 by remember { mutableStateOf(flagList[2]) }
+    var flag1 by rememberSaveable { mutableStateOf(flagList[0]) }
+    var flag2 by rememberSaveable { mutableStateOf(flagList[1]) }
+    var flag3 by rememberSaveable { mutableStateOf(flagList[2]) }
 
-    Column() {
+    Column(modifier = Modifier
+        .verticalScroll(rememberScrollState())) {
 
         Row(modifier = Modifier.fillMaxWidth()
             , horizontalArrangement = Arrangement.Absolute.Right

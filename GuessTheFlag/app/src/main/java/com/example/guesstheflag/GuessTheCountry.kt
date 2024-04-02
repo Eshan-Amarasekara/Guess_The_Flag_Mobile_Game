@@ -1,6 +1,5 @@
 package com.example.guesstheflag
 
-import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -19,10 +18,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -30,7 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +42,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -53,11 +52,7 @@ class GuessTheCountry : ComponentActivity() {
         setContent {
             val context = LocalContext.current
 
-
-            Column(){
-                    CountryCodeList()
-
-            }
+            CountryCodeList()
         }
     }
 }
@@ -66,19 +61,20 @@ class GuessTheCountry : ComponentActivity() {
 
 @Composable
 fun GenerateRandomFlag(list : List<Int>) {
-    Column() {
-        var selectedCountry by remember { mutableStateOf<String?>(null) }
-        var correction by remember { mutableStateOf<String>("") }
-        var buttonText by remember { mutableStateOf<String>("Submit") }
-        var flag by remember { mutableIntStateOf(list.random()) }
-        var flagIndex by remember { mutableIntStateOf(list.indexOf(flag)) }
-        var correctAnswer by remember { mutableStateOf<String>("") }
-        var correctAnswerText by remember { mutableStateOf<String>("") }
-        var valueFromMap by remember { mutableStateOf<String>("") }
+    Column(modifier = Modifier
+        .verticalScroll(rememberScrollState())) {
+        var selectedCountry by rememberSaveable { mutableStateOf<String?>(null) }
+        var correction by rememberSaveable { mutableStateOf<String>("") }
+        var buttonText by rememberSaveable { mutableStateOf<String>("Submit") }
+        var flag by rememberSaveable { mutableIntStateOf(list.random()) }
+        var flagIndex by rememberSaveable { mutableIntStateOf(list.indexOf(flag)) }
+        var correctAnswer by rememberSaveable { mutableStateOf<String>("") }
+        var correctAnswerText by rememberSaveable { mutableStateOf<String>("") }
+        var valueFromMap by rememberSaveable { mutableStateOf<String>("") }
 
 
         Row(modifier= Modifier.align(Alignment.CenterHorizontally)) {
-//            flagIndex = remember { list.indexOf(flag) }
+//            flagIndex = rememberSaveable { list.indexOf(flag) }
             valueFromMap = countriesList.toList()[flagIndex]
             Log.d(flagIndex.toString(), "GenerateRandomFlag: ")
             val imageModifier = Modifier
