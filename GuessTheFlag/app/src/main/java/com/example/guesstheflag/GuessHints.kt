@@ -253,7 +253,7 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ){
-            Text(text = "You have $wrongCount chances left to answer wrong")
+            Text(text = "You have $wrongCount chances left")
         }
 
         Row(modifier = Modifier.fillMaxWidth(),

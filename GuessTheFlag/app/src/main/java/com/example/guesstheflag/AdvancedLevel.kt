@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -91,6 +93,14 @@ fun GenerateRandomFlags(list :List<Int>) {
     var is1Enabled by remember { mutableStateOf(true) }
     var is2Enabled by remember { mutableStateOf(true) }
     var is3Enabled by remember { mutableStateOf(true) }
+    var correctAnswer1Text by remember { mutableStateOf<String>("") }
+    var correctAnswer2Text by remember { mutableStateOf<String>("") }
+    var correctAnswer3Text by remember { mutableStateOf<String>("") }
+    var correctAnswer1Country by remember { mutableStateOf<String>("") }
+    var correctAnswer2Country by remember { mutableStateOf<String>("") }
+    var correctAnswer3Country by remember { mutableStateOf<String>("") }
+    var score by remember { mutableStateOf<Int>(0)}
+
 
 
     flagList.add(flag)
@@ -111,6 +121,15 @@ fun GenerateRandomFlags(list :List<Int>) {
 
     Column() {
 
+        Row(modifier = Modifier.fillMaxWidth()
+            , horizontalArrangement = Arrangement.Absolute.Right
+        ) {
+            Text(
+                text = "Score: $score/3",
+                fontWeight = FontWeight.Bold,
+                fontSize = 26.sp
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
 
         Row{
@@ -150,6 +169,14 @@ fun GenerateRandomFlags(list :List<Int>) {
 
                 ), modifier = Modifier.align(Alignment.CenterVertically),
                 )
+
+        }
+        Row{
+            if (is1Enabled) {
+                Text(text = correctAnswer1Text)
+                Text(text = correctAnswer1Country, style = TextStyle(color = Color.Blue),
+                    fontWeight = FontWeight.Bold)
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -190,6 +217,14 @@ fun GenerateRandomFlags(list :List<Int>) {
 
                 ), modifier = Modifier.align(Alignment.CenterVertically),
             )
+
+        }
+        Row{
+            if (is2Enabled) {
+                Text(text = correctAnswer2Text)
+                Text(text = correctAnswer2Country, style = TextStyle(color = Color.Blue),
+                    fontWeight = FontWeight.Bold)
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -230,8 +265,15 @@ fun GenerateRandomFlags(list :List<Int>) {
 
                 ), modifier = Modifier.align(Alignment.CenterVertically),
             )
-        }
 
+        }
+        Row{
+            if(is3Enabled){
+                Text(text = correctAnswer3Text)
+                Text(text = correctAnswer3Country, style = TextStyle(color = Color.Blue),
+                    fontWeight = FontWeight.Bold)
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
 
         Row (modifier = Modifier.fillMaxWidth(),
@@ -239,6 +281,13 @@ fun GenerateRandomFlags(list :List<Int>) {
         ){
             Button(onClick = {
                 if (buttonText == "Next") {
+                    score = 0
+                    correctAnswer1Text=""
+                    correctAnswer2Text=""
+                    correctAnswer3Text=""
+                    correctAnswer1Country=""
+                    correctAnswer2Country=""
+                    correctAnswer3Country=""
                     flag = list.random()
                     flagIndex =(list.indexOf(flag))
                     valueFromMap =""
@@ -289,7 +338,11 @@ fun GenerateRandomFlags(list :List<Int>) {
                 } else {
                     if (countriesList.toList()[(list.indexOf(flag1))] == guessInput1) {
                         is1Correct = true
+                        if(is1Enabled){
+                            score+=1
+                        }
                         is1Enabled=false
+
                     } else {
                         is1Correct = false
                     }
@@ -301,7 +354,11 @@ fun GenerateRandomFlags(list :List<Int>) {
 
                     if (countriesList.toList()[(list.indexOf(flag2))] == guessInput2) {
                         is2Correct = true
+                        if(is2Enabled){
+                            score+=1
+                        }
                         is2Enabled=false
+
 
                     } else {
                         is2Correct = false
@@ -313,7 +370,11 @@ fun GenerateRandomFlags(list :List<Int>) {
                     })
                     if (countriesList.toList()[(list.indexOf(flag3))] == guessInput3) {
                         is3Correct = true
+                        if(is3Enabled){
+                            score+=1
+                        }
                         is3Enabled=false
+
 
                     } else {
                         is3Correct = false
@@ -333,6 +394,12 @@ fun GenerateRandomFlags(list :List<Int>) {
                     } else if (tries == 0) {
                         correction = "Wrong!"
                         buttonText = "Next"
+                        correctAnswer1Text= "Correct Answer is: "
+                        correctAnswer1Country = countriesList.toList()[(list.indexOf(flag1))]
+                        correctAnswer2Text= "Correct Answer is: "
+                        correctAnswer2Country = countriesList.toList()[(list.indexOf(flag2))]
+                        correctAnswer3Text= "Correct Answer is: "
+                        correctAnswer3Country = countriesList.toList()[(list.indexOf(flag3))]
                     }
                 }
                              },
