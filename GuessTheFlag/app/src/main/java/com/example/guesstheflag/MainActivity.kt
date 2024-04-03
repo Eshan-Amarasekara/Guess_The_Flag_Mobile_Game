@@ -143,6 +143,21 @@ fun HomePage(){
             }
         }
 
+
+        Row{
+            Button(onClick = {
+                var i = Intent(context, AllFlags::class.java)
+                context.startActivity(i)},
+                modifier=Modifier
+                .width(130.dp),
+
+                border = BorderStroke(3.dp, Color(235, 127, 0)),
+                shape = RoundedCornerShape(18.dp),
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0)))
+            {
+                Text(text = "View All Flags")
+            }
+        }
         Spacer(modifier = Modifier.height(64.dp))
 
         Row(modifier = Modifier.fillMaxWidth(),
