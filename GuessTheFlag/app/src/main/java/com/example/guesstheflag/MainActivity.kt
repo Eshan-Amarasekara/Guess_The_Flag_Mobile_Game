@@ -142,7 +142,7 @@ fun HomePage(){
                 Text(text = "Advanced Level")
             }
         }
-
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row{
             Button(onClick = {
