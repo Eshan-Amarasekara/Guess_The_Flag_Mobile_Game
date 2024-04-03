@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+//Additional feature that allows users to view all flags
 class AllFlags : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +48,8 @@ class AllFlags : ComponentActivity() {
 @Composable
 fun GenerateAllFlags(){
 
-    var flag by rememberSaveable { mutableStateOf<Int>(0)}
-    var index by rememberSaveable { mutableStateOf<Int>(0)}
+    var flag by rememberSaveable { mutableStateOf<Int>(0)}      //Variable to store flag
+    var index by rememberSaveable { mutableStateOf<Int>(0)}     //Variable to store index of countriesList
 
     Column() {
         Row{
@@ -57,8 +58,11 @@ fun GenerateAllFlags(){
                     .height(800.dp)
                     .padding(10.dp)
             ) {
+                //Generate all the countries by mapping the countriesList to boxes
                 items(countriesList) { countryName ->
+                    //Getting the index of the flag name selected
                     index= countriesList.indexOf((countryName))
+                    //Using the index to search the flag from the images
                     flag = CountryCodes[index]
                     Box(
                         modifier = Modifier
@@ -71,10 +75,11 @@ fun GenerateAllFlags(){
                                 BorderStroke(4.dp, Color(235, 127, 0)),
                                 shape = RoundedCornerShape(18.dp)
                             ),
-
                         ) {
 
+                        //Adding a column so that flags can be shown in an organized way
                         Column(modifier = Modifier
+                            //Adding top and left padding
                             .padding(top = 80.dp, start = 80.dp)
                             .fillMaxWidth()
                             ,verticalArrangement = Arrangement.Center)
@@ -100,6 +105,7 @@ fun GenerateAllFlags(){
                             .fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         )  {
+                            //Displaying country name
                             Text(
                                 text = " $countryName",
                                 fontSize = 28.sp,
