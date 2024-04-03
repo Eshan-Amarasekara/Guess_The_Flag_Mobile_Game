@@ -1,5 +1,6 @@
 package com.example.guesstheflag
 
+//Optimized Imports
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,98 +39,79 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 class GuessHints : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            GenerateRandomFlagForHints(CountryCodes)
+            var timer = intent.getBooleanExtra("timer", false)
+            GenerateRandomFlagForHints(CountryCodes,timer)
         }
     }
 }
 
-val CountryCodes = listOf(
-    R.drawable.ad, R.drawable.ae, R.drawable.af, R.drawable.ag, R.drawable.ai, R.drawable.al, R.drawable.am, R.drawable.ao, R.drawable.aq, R.drawable.ar,
-    R.drawable.`as`, R.drawable.at, R.drawable.au, R.drawable.aw, R.drawable.ax, R.drawable.az, R.drawable.ba, R.drawable.bb, R.drawable.bd, R.drawable.be,
-    R.drawable.bf, R.drawable.bg, R.drawable.bh, R.drawable.bi, R.drawable.bj, R.drawable.bl, R.drawable.bm, R.drawable.bn, R.drawable.bo, R.drawable.bq,
-    R.drawable.br, R.drawable.bs, R.drawable.bt, R.drawable.bv, R.drawable.bw, R.drawable.by, R.drawable.bz, R.drawable.ca, R.drawable.cc, R.drawable.cd,
-    R.drawable.cf, R.drawable.cg, R.drawable.ch, R.drawable.ci, R.drawable.ck, R.drawable.cl, R.drawable.cm, R.drawable.cn, R.drawable.co, R.drawable.cr,
-    R.drawable.cu, R.drawable.cv, R.drawable.cw, R.drawable.cx, R.drawable.cy, R.drawable.cz, R.drawable.de, R.drawable.dj, R.drawable.dk, R.drawable.dm,
-    R.drawable.dz, R.drawable.ec, R.drawable.ee, R.drawable.eg, R.drawable.eh, R.drawable.er, R.drawable.es, R.drawable.et, R.drawable.eu, R.drawable.fi,
-    R.drawable.fj, R.drawable.fk, R.drawable.fm, R.drawable.fo, R.drawable.fr, R.drawable.ga, R.drawable.gb, R.drawable.gbeng, R.drawable.gbnir,
-    R.drawable.gbsct, R.drawable.gbwls, R.drawable.gd, R.drawable.ge, R.drawable.gf, R.drawable.gg, R.drawable.gh, R.drawable.gi, R.drawable.gl,
-    R.drawable.gm, R.drawable.gn, R.drawable.gp, R.drawable.gq, R.drawable.gr, R.drawable.gs, R.drawable.gt, R.drawable.gu, R.drawable.gw, R.drawable.gy,
-    R.drawable.hk, R.drawable.hm, R.drawable.hn, R.drawable.hr, R.drawable.ht, R.drawable.hu, R.drawable.id, R.drawable.ie, R.drawable.il, R.drawable.im,
-    R.drawable.`in`, R.drawable.io, R.drawable.iq, R.drawable.ir, R.drawable.`is`, R.drawable.it, R.drawable.je, R.drawable.jm, R.drawable.jo, R.drawable.jp,
-    R.drawable.ke, R.drawable.kg, R.drawable.kh, R.drawable.ki, R.drawable.km, R.drawable.kn, R.drawable.kp, R.drawable.kr, R.drawable.kw, R.drawable.ky,
-    R.drawable.kz, R.drawable.la, R.drawable.lb, R.drawable.lc, R.drawable.li, R.drawable.lk, R.drawable.lr, R.drawable.ls, R.drawable.lt, R.drawable.lu,
-    R.drawable.lv, R.drawable.ly, R.drawable.ma, R.drawable.mc, R.drawable.md, R.drawable.me, R.drawable.mf, R.drawable.mg, R.drawable.mh, R.drawable.mk,
-    R.drawable.ml, R.drawable.mm, R.drawable.mn, R.drawable.mo, R.drawable.mp, R.drawable.mq, R.drawable.mr, R.drawable.ms, R.drawable.mt, R.drawable.mu,
-    R.drawable.mv, R.drawable.mw, R.drawable.mx, R.drawable.my, R.drawable.mz, R.drawable.na, R.drawable.nc, R.drawable.ne, R.drawable.nf, R.drawable.ng,
-    R.drawable.ni, R.drawable.nl, R.drawable.no, R.drawable.np, R.drawable.nr, R.drawable.nu, R.drawable.nz, R.drawable.om, R.drawable.pa, R.drawable.pe,
-    R.drawable.pf, R.drawable.pg, R.drawable.ph, R.drawable.pk, R.drawable.pl, R.drawable.pm, R.drawable.pn, R.drawable.pr, R.drawable.ps, R.drawable.pt,
-    R.drawable.pw, R.drawable.py, R.drawable.qa, R.drawable.re, R.drawable.ro, R.drawable.rs, R.drawable.ru, R.drawable.rw, R.drawable.sa, R.drawable.sb,
-    R.drawable.sc, R.drawable.sd, R.drawable.se, R.drawable.sg, R.drawable.sh, R.drawable.si, R.drawable.sj, R.drawable.sk, R.drawable.sl, R.drawable.sm,
-    R.drawable.sn, R.drawable.so, R.drawable.sr, R.drawable.ss, R.drawable.st, R.drawable.sv, R.drawable.sx, R.drawable.sy, R.drawable.sz, R.drawable.tc,
-    R.drawable.td, R.drawable.tf, R.drawable.tg, R.drawable.th, R.drawable.tj, R.drawable.tk, R.drawable.tl, R.drawable.tm, R.drawable.tn, R.drawable.to,
-    R.drawable.tr, R.drawable.tt, R.drawable.tv, R.drawable.tw, R.drawable.tz, R.drawable.ua, R.drawable.ug, R.drawable.um, R.drawable.us, R.drawable.uy,
-    R.drawable.uz, R.drawable.va, R.drawable.vc, R.drawable.ve, R.drawable.vg, R.drawable.vi, R.drawable.vn, R.drawable.vu, R.drawable.wf, R.drawable.ws,
-    R.drawable.xk, R.drawable.ye, R.drawable.yt, R.drawable.za, R.drawable.zm, R.drawable.zw
-)
 
-//val countriesList2 = listOf(
-//    "Andorra", "United Arab Emirates", "Afghanistan", "Antigua and Barbuda", "Anguilla", "Albania", "Armenia", "Angola", "Antarctica", "Argentina",
-//    "American Samoa", "Austria", "Australia", "Aruba", "Åland Islands", "Azerbaijan", "Bosnia and Herzegovina", "Barbados", "Bangladesh", "Belgium",
-//    "Burkina Faso", "Bulgaria", "Bahrain", "Burundi", "Benin", "Saint Barthélemy", "Bermuda", "Brunei Darussalam", "Bolivia, Plurinational State of",
-//    "Caribbean Netherlands", "Brazil", "Bahamas", "Bhutan", "Bouvet Island", "Botswana", "Belarus", "Belize", "Canada", "Cocos (Keeling) Islands",
-//    "Congo", "Central African Republic", "Republic of the Congo", "Switzerland", "Côte d'Ivoire", "Cook Islands", "Chile", "Cameroon", "China",
-//    "Colombia", "Costa Rica", "Cuba", "Cape Verde", "Curaçao", "Christmas Island", "Cyprus", "Czech Republic", "Germany", "Djibouti", "Denmark",
-//    "Dominica", "Algeria", "Ecuador", "Estonia", "Egypt", "Western Sahara", "Eritrea", "Spain", "Ethiopia", "Europe", "Finland", "Fiji", "Falkland Islands",
-//    "Micronesia", "Faroe Islands", "France", "Gabon", "United Kingdom", "England", "Northern Ireland", "Scotland", "Wales", "Grenada", "Georgia",
-//    "French Guiana", "Guernsey", "Ghana", "Gibraltar", "Greenland", "Gambia", "Guinea", "Guadeloupe", "Equatorial Guinea", "Greece",
-//    "South Georgia and the South Sandwich Islands", "Guatemala", "Guam", "Guinea-Bissau", "Guyana", "Hong Kong", "Heard Island and McDonald Islands",
-//    "Honduras", "Croatia", "Haiti", "Hungary", "Indonesia", "Ireland", "Israel", "Isle of Man", "India", "British Indian Ocean Territory", "Iraq",
-//    "Iran, Islamic Republic of", "Iceland", "Italy", "Jersey", "Jamaica", "Jordan", "Japan", "Kenya", "Kyrgyzstan", "Cambodia", "Kiribati",
-//    "Comoros", "Saint Kitts and Nevis", "Korea", "Korea, Republic of", "Kuwait", "Cayman Islands", "Kazakhstan", "Laos ", "Lebanon",
-//    "Saint Lucia", "Liechtenstein", "Sri Lanka", "Liberia", "Lesotho", "Lithuania", "Luxembourg", "Latvia", "Libya", "Morocco", "Monaco",
-//    "Moldova, Republic of", "Montenegro", "Saint Martin", "Madagascar", "Marshall Islands", "North Macedonia", "Mali", "Myanmar", "Mongolia",
-//    "Macao", "Northern Mariana Islands", "Martinique", "Mauritania", "Montserrat", "Malta", "Mauritius", "Maldives", "Malawi", "Mexico",
-//    "Malaysia", "Mozambique", "Namibia", "New Caledonia", "Niger", "Norfolk Island", "Nigeria", "Nicaragua", "Netherlands", "Norway", "Nepal",
-//    "Nauru", "Niue", "New Zealand", "Oman", "Panama", "Peru", "French Polynesia", "Papua New Guinea", "Philippines", "Pakistan", "Poland",
-//    "Saint Pierre and Miquelon", "Pitcairn", "Puerto Rico", "Palestine", "Portugal", "Palau", "Paraguay", "Qatar", "Réunion", "Romania", "Serbia",
-//    "Russian Federation", "Rwanda", "Saudi Arabia", "Solomon Islands", "Seychelles", "Sudan", "Sweden", "Singapore", "Saint Helena, Ascension and Tristan da Cunha",
-//    "Slovenia", "Svalbard and Jan Mayen Islands", "Slovakia", "Sierra Leone", "San Marino", "Senegal", "Somalia", "Suriname", "South Sudan",
-//    "Sao Tome and Principe", "El Salvador", "Sint Maarten (Dutch part)", "Syrian Arab Republic", "Swaziland", "Turks and Caicos Islands", "Chad",
-//    "French Southern Territories", "Togo", "Thailand", "Tajikistan", "Tokelau", "Timor-Leste", "Turkmenistan", "Tunisia", "Tonga", "Turkey",
-//    "Trinidad and Tobago", "Tuvalu", "Taiwan (Republic of China)", "Tanzania, United Republic of", "Ukraine", "Uganda", "US Minor Outlying Islands",
-//    "United States", "Uruguay", "Uzbekistan", "Holy See (Vatican City State)", "Saint Vincent and the Grenadines", "Venezuela, Bolivarian Republic of",
-//    "Virgin Islands, British", "Virgin Islands, U.S.", "Vietnam", "Vanuatu", "Wallis and Futuna Islands", "Samoa", "Kosovo", "Yemen", "Mayotte",
-//    "South Africa", "Zambia", "Zimbabwe"
-//)
 
 @Composable
-fun GenerateRandomFlagForHints(list : List<Int>) {
+fun GenerateRandomFlagForHints(list : List<Int>, timer:Boolean) {
+    //https://stackoverflow.com/questions/68164883/how-do-i-create-a-jetpack-compose-column-where-a-middle-child-is-scrollable-but
     Column(modifier = Modifier
         .verticalScroll(rememberScrollState())) {
-        var correction by rememberSaveable { mutableStateOf<String>("") }
-        var buttonText by rememberSaveable { mutableStateOf<String>("Submit") }
-        var flag by rememberSaveable { mutableIntStateOf(list.random()) }
-        var flagIndex by rememberSaveable { mutableIntStateOf(list.indexOf(flag)) }
-        var correctAnswer by rememberSaveable { mutableStateOf<String>("") }
-        var correctAnswerText by rememberSaveable { mutableStateOf<String>("") }
-        var valueFromMap by rememberSaveable { mutableStateOf<String>("") }
-        var dashList by rememberSaveable{ mutableStateOf( mutableListOf<String>()) }
-        var letterList by rememberSaveable { mutableStateOf( mutableListOf<Char>()) }
-        var userGuess by rememberSaveable { mutableStateOf("") }
-        var wrongCount by rememberSaveable { mutableStateOf<Int>(3) }
+        var correction by rememberSaveable { mutableStateOf<String>("") }                     //Variable used to check the correction of the answer
+        var buttonText by rememberSaveable { mutableStateOf<String>("Submit") }               //Text for button, initiated with "Submit"
+        var flag by rememberSaveable { mutableIntStateOf(list.random()) }                           //getting the first random flag
+        var flagIndex by rememberSaveable { mutableIntStateOf(list.indexOf(flag)) }                 //Getting the index of the first flag
+        var correctAnswer by rememberSaveable { mutableStateOf<String>("") }                  //Variable to hold correct answer
+        var correctAnswerText by rememberSaveable { mutableStateOf<String>("") }              //Variable to hold the text before the answer
+        var valueFromList by rememberSaveable { mutableStateOf<String>("") }                  //Variable created to get String value of country name
+        var dashList by rememberSaveable{ mutableStateOf( mutableListOf<String>()) }                //List to contain the dashes that should be printed
+        var letterList by rememberSaveable { mutableStateOf( mutableListOf<Char>()) }               //List to contain the letters of random flag
+        var userGuess by rememberSaveable { mutableStateOf("") }                              //Variable to hold user's input
+        var wrongCount by rememberSaveable { mutableStateOf<Int>(3) }                         //Attempt count
+        var time by rememberSaveable { mutableStateOf(10)}                                    //time variable with 10 initial to start the timer at 10
+        var pause by rememberSaveable { mutableStateOf(false) }                               //Boolean variable to check if the timer should pause
 
+        Row {
+            //timer:
+            //https://medium.com/@android-world/jetpack-compose-countdown-timer-9531dd3119a6
+            if (timer) {
+                LaunchedEffect(key1 = time, key2 = pause) {
+                    while (time > 0 && !pause) {
+                        delay(1.seconds)
+                        time--
+                    }
+                }
+            }
 
+            //Auto submit when timer hits 0
+            if(time==0){
+                pause=!pause
+                time = 10
+                buttonText = "Next"
+                correctAnswer = valueFromList
+                correctAnswerText+="Correct Answer is:"
+                correction = "Wrong!"
+            }
+
+            //display timer if switch is toggled
+            if(timer) {
+                Text(
+                    text = "Time left: $time",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp
+                )
+            }
+        }
 
 
         Row(modifier= Modifier.align(Alignment.CenterHorizontally)) {
-//            flagIndex = rememberSaveable { list.indexOf(flag) }
-            valueFromMap = countriesList.toList()[flagIndex]
-            letterList = valueFromMap.lowercase().toMutableList()
+            valueFromList = countriesList.toList()[flagIndex]
+            letterList = valueFromList.lowercase().toMutableList()  //converting the flag name to list elements
+
+            //Checking if both letterList and dashList are both same size
+            //If not for the number of letters in letterList, adding dashes and spaces to dash list
             if(letterList.size != dashList.size) {
                 for (letter in letterList) {
                     if (letter == ' ') {
@@ -138,12 +121,14 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
                     }
                 }
             }
+
+            //Logs to get following data for debugging
             Log.d(flagIndex.toString(), "GenerateRandomFlag: ")
             Log.d(dashList.toString(),"Dash list")
             Log.d(dashList.size.toString(),"Dash list size")
             Log.d(letterList.size.toString(),"Letter list size")
             Log.d(letterList.toString(), "letter List")
-            Log.d(valueFromMap,"Country from list")
+            Log.d(valueFromList,"Country from list")
 
 
 
@@ -153,13 +138,12 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
                 .sizeIn(maxWidth = 300.dp, maxHeight = 300.dp)
 
 
-
+            //Rendering image
             Image(
                 painter = painterResource(id = flag),
                 contentDescription = " ",
                 contentScale = ContentScale.FillHeight,
                 modifier = imageModifier
-
             )
         }
 
@@ -171,14 +155,12 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
                         style = TextStyle (fontStyle = FontStyle.Italic),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,)
-
-
         }
 
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center) {
+            //Calling userguess function
             userGuess = userGuesses()
-
         }
 
 
@@ -188,36 +170,42 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
 
             Button(
                 onClick = {
+                    //Resetting variables when "Next" is clicked
                     if (buttonText == "Next") {
                         correction = ""
                         buttonText = "Submit"
                         correctAnswer = ""
                         correctAnswerText = ""
-                        valueFromMap=""
+                        valueFromList=""
                         val flag2 = list.random()
                         flag = flag2
                         flagIndex = list.indexOf(flag)
                         dashList.clear()
                         letterList.clear()
                         wrongCount=3
+                        pause=false
+                        time = 10
 
                     }else{
+                        //Checking if user input is in the letterList, if so assigning that to the relevant element of dash list
                         for (i in 0..<(letterList.size)){
                             if(userGuess == letterList[i].toString()){
                                 dashList[i] = userGuess
                                 Log.d(dashList.toString(),"updated list")
-
                             }
                         }
 
+                        //Counting attempts
                         if(userGuess !in letterList.toString()){
                             wrongCount-=1
                         }
 
-
+                        //if the attempts are finished or the answer is guessed, make "Next" button available
                         if ((wrongCount == 0) || "-" !in dashList){
+                            pause=!pause
+                            time = 10
                             buttonText = "Next"
-                            correctAnswer = valueFromMap
+                            correctAnswer = valueFromList
                             correctAnswerText+="Correct Answer is:"
                             if(wrongCount==0){
                                 correction = "Wrong!"
@@ -244,7 +232,7 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-
+            //checking what correction value is and displaying accordingly
             if(correction == "Correct!") {
                 Text(text = correction,
                     style = TextStyle(color = Color.Green, fontStyle = FontStyle.Italic),
@@ -271,8 +259,8 @@ fun GenerateRandomFlagForHints(list : List<Int>) {
     }
 }
 
+//Composable function created to make text fields for users
 //https://developer.android.com/develop/ui/compose/text/user-input
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun userGuesses(): String {
     var guessInput by rememberSaveable { mutableStateOf("") }
@@ -289,12 +277,7 @@ fun userGuesses(): String {
             focusedContainerColor = Color(235, 127, 0).copy(alpha = 0.2f),
             focusedLabelColor = Color(235, 127, 0),
             unfocusedContainerColor = Color(240,240,240)
-
         )
-
-
     )
-
     return guessInput
-
 }

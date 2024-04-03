@@ -1,5 +1,6 @@
 package com.example.guesstheflag
 
+//Optimized Imports
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -27,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -44,15 +45,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 class GuessTheCountry : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val context = LocalContext.current
 
-            CountryCodeList()
+            //getting the data passed from the MainActivity
+            var timer = intent.getBooleanExtra("timer", false)
+            GenerateRandomFlag(CountryCodes,timer)
+
         }
     }
 }
@@ -60,148 +65,210 @@ class GuessTheCountry : ComponentActivity() {
 //Function to Generate Random Flag from list
 
 @Composable
-fun GenerateRandomFlag(list : List<Int>) {
-    Column(modifier = Modifier
-        .verticalScroll(rememberScrollState())) {
-        var selectedCountry by rememberSaveable { mutableStateOf<String?>(null) }
-        var correction by rememberSaveable { mutableStateOf<String>("") }
-        var buttonText by rememberSaveable { mutableStateOf<String>("Submit") }
-        var flag by rememberSaveable { mutableIntStateOf(list.random()) }
-        var flagIndex by rememberSaveable { mutableIntStateOf(list.indexOf(flag)) }
-        var correctAnswer by rememberSaveable { mutableStateOf<String>("") }
-        var correctAnswerText by rememberSaveable { mutableStateOf<String>("") }
-        var valueFromMap by rememberSaveable { mutableStateOf<String>("") }
+fun GenerateRandomFlag(list : List<Int>, timer:Boolean) {
+    //https://stackoverflow.com/questions/68164883/how-do-i-create-a-jetpack-compose-column-where-a-middle-child-is-scrollable-but
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
+        var selectedCountry by rememberSaveable { mutableStateOf<String?>(null) }             //Variable to hold user selected country
+        var correction by rememberSaveable { mutableStateOf<String>("") }                     //Variable used to check the correction of the answer
+        var buttonText by rememberSaveable { mutableStateOf<String>("Submit") }               //Text for button, initiated with "Submit"
+        var flag by rememberSaveable { mutableIntStateOf(list.random()) }                           //Generating random flag from list
+        var flagIndex by rememberSaveable { mutableIntStateOf(list.indexOf(flag)) }                 //Getting index of flag
+        var correctAnswer by rememberSaveable { mutableStateOf<String>("") }                  //Variable to hold correct answer
+        var correctAnswerText by rememberSaveable { mutableStateOf<String>("") }              //Variable to hold the text before the answer
+        var valueFromList by rememberSaveable { mutableStateOf<String>("") }                  //Variable used to hold name of correct country
+        var time by rememberSaveable { mutableStateOf(10)}                                    //time variable with 10 initial to start the timer at 10
+        var pause by rememberSaveable { mutableStateOf(false) }                               //Boolean variable to check if the timer should pause
+        var isEnabled by rememberSaveable { mutableStateOf(true) }                            //Boolean variable to make list items disabled or enabled
+
+        //Getting String name of correct flag
+        valueFromList = countriesList.toList()[flagIndex]
 
 
-        Row(modifier= Modifier.align(Alignment.CenterHorizontally)) {
-//            flagIndex = rememberSaveable { list.indexOf(flag) }
-            valueFromMap = countriesList.toList()[flagIndex]
-            Log.d(flagIndex.toString(), "GenerateRandomFlag: ")
-            val imageModifier = Modifier
-                .padding(20.dp)
-                .border(BorderStroke(6.dp, Color.Black))
-                .sizeIn(maxWidth = 300.dp, maxHeight = 300.dp)
-
-
-
-            Image(
-                painter = painterResource(id = flag),
-                contentDescription = " ",
-                contentScale = ContentScale.FillHeight,
-                modifier = imageModifier
-
-            )
-        }
-
-
+        //Timer:
         Row {
-            LazyColumn(
-                modifier = Modifier
-                    .height(300.dp)
-//                    .width(600.dp)
-                    .padding(10.dp)
-
-            ) {
-                //Generating answers by mapping values into clickable boxes
-                items(countriesList) { countryName ->
-                    val isSelected = countryName == selectedCountry
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                if (isSelected) Color(235, 127, 0) else Color.White,
-                                shape = RoundedCornerShape(18.dp) // Setting border radius
-                            )
-                            .clickable(onClick = { selectedCountry = countryName })
-                            .border(
-                                BorderStroke(4.dp, Color(235, 127, 0)),
-                                shape = RoundedCornerShape(18.dp)
-                            ),
-
-                        ) {
-                        Text(
-                            text = " $countryName",
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Left,
-                            color = if (isSelected) Color.White else Color.Black, // Changing Colors if Selected
-                            modifier = Modifier
-                                .fillMaxWidth() // Ensures that text does not overflow horizontally
-                                .padding(horizontal = 16.dp) // Adding padding to prevent overflow
-                        )
+            //https://medium.com/@android-world/jetpack-compose-countdown-timer-9531dd3119a6
+            if (timer) {
+                LaunchedEffect(key1 = time, key2 = pause) {
+                    while (time > 0 && !pause) {
+                        delay(1.seconds)
+                        time--
                     }
-                    Spacer(modifier = Modifier.height(8.dp)) // Add space between boxes
                 }
             }
 
+            //Auto submit when timer hits 0
+            if(time==0){
+                pause=!pause
+                time = 10
+                if (valueFromList == selectedCountry) {
+                    correction = "Correct!"
+                } else {
+                    correction = "Wrong!"
+                }
+                buttonText = "Next"
+                correctAnswer = valueFromList
+                correctAnswerText += "Correct Answer is:"
+                isEnabled = false
+            }
 
+            //Display timer if switch is toggled
+            if(timer) {
+                Text(
+                    text = "Time left: $time",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp
+                )
+            }
         }
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-        ){
+            //Image generation
+            Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
 
-            Button(
-                onClick = {
-                    if (buttonText == "Next") {
-                        selectedCountry =null
-                        correction = ""
-                        buttonText = "Submit"
-                        correctAnswer = ""
-                        correctAnswerText = ""
-                        valueFromMap=""
-                        val flag2 = list.random()
-                        flag = flag2
-                        flagIndex = list.indexOf(flag)
+                //Log to get flag index
+                Log.d(flagIndex.toString(), "GenerateRandomFlag: ")
 
-                    }else{
-                        if (valueFromMap == selectedCountry) {
-                            correction = "Correct!"
-                        } else {
-                            correction = "Wrong!"
+                //Adding customised properties for image separately and assigning to a variable
+                val imageModifier = Modifier
+                    .padding(20.dp)
+                    .border(BorderStroke(6.dp, Color.Black))
+                    .sizeIn(maxWidth = 300.dp, maxHeight = 300.dp)
+
+                //Rendering image
+                Image(
+                    painter = painterResource(id = flag),
+                    contentDescription = " ",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = imageModifier
+
+                )
+            }
+
+            //Lazy column used to display the list of countries to choose
+            Row {
+                LazyColumn(
+                    modifier = Modifier
+                        .height(300.dp)
+//                    .width(600.dp)
+                        .padding(10.dp)
+                ) {
+                    //Generating answers by mapping values into clickable boxes
+                    items(countriesList) { countryName ->
+                        val isSelected = countryName == selectedCountry
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    if (isSelected) Color(235, 127, 0) else Color.White,
+                                    shape = RoundedCornerShape(18.dp) // Setting border radius
+                                )
+                                //making boxes clickable
+                                .clickable(
+                                    enabled = isEnabled,
+                                    onClick = { selectedCountry = countryName })
+                                .border(
+                                    BorderStroke(4.dp, Color(235, 127, 0)),
+                                    shape = RoundedCornerShape(18.dp)
+                                ),
+
+                            ) {
+                            Text(
+                                text = " $countryName",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Left,
+                                color = if (isSelected) Color.White else Color.Black, // Changing Colors if Selected
+                                modifier = Modifier
+                                    .fillMaxWidth() // Ensures that text does not overflow horizontally
+                                    .padding(horizontal = 16.dp) // Adding padding to prevent overflow
+                            )
                         }
-                        buttonText = "Next"
-                        correctAnswer = valueFromMap
-                        correctAnswerText+="Correct Answer is:"
+                        Spacer(modifier = Modifier.height(8.dp)) // Add space between boxes
                     }
-                },
-                colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
+                }
+
+
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
             ) {
-                Text(text = buttonText)
+
+                Button(
+                    onClick = {
+                        //Resetting all variables when "Next" is clicked
+                        if (buttonText == "Next") {
+                            selectedCountry = null
+                            correction = ""
+                            buttonText = "Submit"
+                            correctAnswer = ""
+                            correctAnswerText = ""
+                            valueFromList = ""
+                            val flag2 = list.random()
+                            flag = flag2
+                            flagIndex = list.indexOf(flag)
+                            time=10
+                            pause=false
+                            isEnabled = true
+                        } else {
+                            //checking answer when "Submit" is clicked
+                            pause=!pause
+                            if (valueFromList == selectedCountry) {
+                                correction = "Correct!"
+                            } else {
+                                correction = "Wrong!"
+                            }
+                            buttonText = "Next"
+                            correctAnswer = valueFromList
+                            correctAnswerText += "Correct Answer is:"
+                            isEnabled = false
+
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
+                ) {
+                    Text(text = buttonText)
+                }
+
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                //checking what correction value is and displaying accordingly
+                if (correction == "Correct!") {
+                    Text(
+                        text = correction,
+                        style = TextStyle(color = Color.Green, fontStyle = FontStyle.Italic),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                } else if (correction == "Wrong!") {
+                    Text(
+                        text = correction,
+                        style = TextStyle(color = Color.Red, fontStyle = FontStyle.Italic),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
 
-        }
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            if(correction == "Correct!") {
-                Text(text = correction,
-                style = TextStyle(color = Color.Green, fontStyle = FontStyle.Italic),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }else if(correction == "Wrong!"){
-                Text(text = correction,
-                    style = TextStyle(color = Color.Red, fontStyle = FontStyle.Italic),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+            Row {
+                //Text added separately to add blue color only to the correct country part
+                Text(text = correctAnswerText)
+                Text(text = correctAnswer, style = TextStyle(color = Color.Blue))
             }
-        }
-
-        Row{
-            //Text added separately to add blue color only to the correct country part
-            Text(text= correctAnswerText)
-            Text(text = correctAnswer,style = TextStyle(color = Color.Blue))
         }
     }
-}
+
 
 
 
 //@Preview
-@Composable
+
 //Country image name list with rendering code snippet
-fun CountryCodeList() {
+
     val CountryCodes = listOf(
         R.drawable.ad, R.drawable.ae, R.drawable.af, R.drawable.ag, R.drawable.ai, R.drawable.al, R.drawable.am, R.drawable.ao, R.drawable.aq, R.drawable.ar,
         R.drawable.`as`, R.drawable.at, R.drawable.au, R.drawable.aw, R.drawable.ax, R.drawable.az, R.drawable.ba, R.drawable.bb, R.drawable.bd, R.drawable.be,
@@ -230,8 +297,7 @@ fun CountryCodeList() {
         R.drawable.uz, R.drawable.va, R.drawable.vc, R.drawable.ve, R.drawable.vg, R.drawable.vi, R.drawable.vn, R.drawable.vu, R.drawable.wf, R.drawable.ws,
         R.drawable.xk, R.drawable.ye, R.drawable.yt, R.drawable.za, R.drawable.zm, R.drawable.zw
     )
-GenerateRandomFlag(CountryCodes)
-}
+
 
 
 
@@ -264,6 +330,7 @@ val countriesList = listOf(
     "Virgin Islands, British", "Virgin Islands, U.S.", "Vietnam", "Vanuatu", "Wallis and Futuna Islands", "Samoa", "Kosovo", "Yemen", "Mayotte",
     "South Africa", "Zambia", "Zimbabwe"
 )
+
 
 //@Composable
 
